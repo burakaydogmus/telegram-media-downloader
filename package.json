@@ -1,0 +1,43 @@
+{
+  "name": "telegram-media-downloader",
+  "version": "1.0.0",
+  "description": "A production-quality Chrome Extension (Manifest V3) that improves media management on Telegram Web: detection, organization, bulk selection, bulk download, search, filtering, and export reports.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Telegram Media Downloader Contributors",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc --noEmit && vite build && vite build --config vite.content.config.ts",
+    "build:content": "vite build --config vite.content.config.ts",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,css,html,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,css,html,md}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@playwright/test": "^1.48.2",
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "happy-dom": "^15.11.7",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
+  }
+}
