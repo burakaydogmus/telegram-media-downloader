@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Telegram Media Downloader",
+    "description": "The display name of the extension."
+  },
+  "extDescription": {
+    "message": "Detect, organize, search, filter, and bulk-download media on Telegram Web, with export reports.",
+    "description": "The store description of the extension."
+  }
+}
