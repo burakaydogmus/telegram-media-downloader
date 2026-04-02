@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "Telegram Medya İndirici",
+    "description": "Eklentinin görünen adı."
+  },
+  "extDescription": {
+    "message": "Telegram Web’de medyayı algılayın, düzenleyin, arayın, filtreleyin ve toplu indirin; rapor olarak dışa aktarın.",
+    "description": "Eklentinin mağaza açıklaması."
+  }
+}
