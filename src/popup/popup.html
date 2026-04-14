@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram Media Downloader</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <main class="popup" role="main">
+      <header class="popup__header">
+        <img
+          class="popup__logo"
+          src="../../icons/icon48.png"
+          alt=""
+          width="28"
+          height="28"
+        />
+        <h1 class="popup__title" data-i18n="panel_title">Media Downloader</h1>
+      </header>
+
+      <p class="popup__status" id="status" role="status" aria-live="polite">…</p>
+
+      <dl class="popup__stats" id="stats" hidden>
+        <div class="popup__stat">
+          <dt data-i18n="stat_total">Total</dt>
+          <dd id="stat-total">0</dd>
+        </div>
+        <div class="popup__stat">
+          <dt data-i18n="stat_selected">Selected</dt>
+          <dd id="stat-selected">0</dd>
+        </div>
+      </dl>
+
+      <div class="popup__actions">
+        <button
+          class="btn btn--primary"
+          id="toggle"
+          type="button"
+          data-i18n="popup_toggle_panel"
+        >
+          Toggle panel
+        </button>
+        <button class="btn" id="rescan" type="button" data-i18n="popup_rescan">
+          Rescan media
+        </button>
+        <button
+          class="btn"
+          id="open-telegram"
+          type="button"
+          data-i18n="popup_open_telegram"
+        >
+          Open Telegram Web
+        </button>
+        <button
+          class="btn btn--ghost"
+          id="options"
+          type="button"
+          data-i18n="options_title"
+        >
+          Settings
+        </button>
+      </div>
+    </main>
+
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>
