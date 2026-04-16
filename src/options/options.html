@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram Media Downloader — Settings</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main class="options" role="main">
+      <h1 class="options__title" data-i18n="options_title">Settings</h1>
+
+      <form id="settings-form" class="options__form">
+        <label class="field field--switch">
+          <span class="field__label">
+            <span data-i18n="options_auto_scan">Automatic scanning</span>
+            <small class="field__hint" data-i18n="options_auto_scan_desc">
+              Continuously detect new media as you scroll.
+            </small>
+          </span>
+          <input type="checkbox" id="autoScan" name="autoScan" />
+        </label>
+
+        <label class="field">
+          <span class="field__label" data-i18n="options_theme">Theme</span>
+          <select id="theme" name="theme">
+            <option value="auto" data-i18n="options_theme_auto">Adapt to Telegram</option>
+            <option value="light" data-i18n="options_theme_light">Light</option>
+            <option value="dark" data-i18n="options_theme_dark">Dark</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label" data-i18n="options_language">Language</span>
+          <select id="language" name="language">
+            <option value="en" data-i18n="options_language_en">English</option>
+            <option value="tr" data-i18n="options_language_tr">Türkçe</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label" data-i18n="options_log_level">Logging level</span>
+          <select id="logLevel" name="logLevel">
+            <option value="debug">debug</option>
+            <option value="info">info</option>
+            <option value="warn">warn</option>
+            <option value="error">error</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label" data-i18n="options_queue_size"
+            >Max concurrent downloads</span
+          >
+          <input
+            type="number"
+            id="maxConcurrentDownloads"
+            name="maxConcurrentDownloads"
+            min="1"
+            max="10"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field__label" data-i18n="options_max_retries">Max retries</span>
+          <input type="number" id="maxRetries" name="maxRetries" min="0" max="10" />
+        </label>
+
+        <div class="options__actions">
+          <button type="submit" class="btn btn--primary" data-i18n="options_save">
+            Save
+          </button>
+          <button type="button" id="reset" class="btn" data-i18n="options_reset">
+            Reset to defaults
+          </button>
+        </div>
+
+        <p id="saved" class="options__saved" role="status" aria-live="polite" hidden></p>
+      </form>
+    </main>
+
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>
