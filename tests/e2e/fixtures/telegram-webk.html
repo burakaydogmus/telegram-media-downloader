@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Telegram Web K (E2E fixture)</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+      }
+      .bubbles {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .bubble {
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      img.media-photo {
+        width: 80px;
+        height: 60px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- DOM signatures the detector and scanner look for on Web K. -->
+    <div id="column-center">
+      <div class="bubbles scrollable">
+        <div class="bubble" data-mid="1">
+          <img
+            class="media-photo"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+          />
+          <time datetime="2026-06-19T10:00:00Z">10:00</time>
+        </div>
+        <div class="bubble" data-mid="2">
+          <img
+            class="media-photo"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+          />
+          <time datetime="2026-06-18T09:00:00Z">09:00</time>
+        </div>
+        <div class="bubble" data-mid="3">
+          <div class="document">
+            <a href="data:text/plain;base64,aGVsbG8gd29ybGQ="></a>
+            <div class="document-name">notes.txt</div>
+            <div class="document-size">1.0 KB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
