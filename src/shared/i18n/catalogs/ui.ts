@@ -2,6 +2,115 @@
  * Translation keys owned by the "ui" area. Add keys to `uiEn` and the same
  * keys to `uiTr` (the type enforces parity). Merged into the main catalog.
  */
-export const uiEn = {} as const;
+export const uiEn = {
+  section_media: 'Media',
+  section_crawl: 'Whole-chat scan',
 
-export const uiTr: Readonly<Record<keyof typeof uiEn, string>> = {};
+  filter_types_label: 'Media types',
+  filter_date_label: 'Date',
+  filter_scope_label: 'Scope',
+  filter_scope_all: 'All chats',
+  filter_scope_current: 'This chat',
+  filter_hide_downloaded: 'Hide downloaded',
+  filter_reset: 'Reset filters',
+
+  grid_label: 'Media items',
+  grid_empty: 'No media to show',
+  grid_hint: 'Click to select, Shift+click for a range, double-click to show in chat.',
+  grid_type_photo: 'Photo',
+  grid_type_video: 'Video',
+  grid_type_gif: 'GIF',
+  grid_type_document: 'File',
+  grid_type_audio: 'Audio',
+  grid_downloaded: 'Downloaded',
+  grid_locate: 'Show in chat',
+
+  queue_pause: 'Pause',
+  queue_resume: 'Resume',
+  queue_paused: 'Queue paused',
+  queue_paused_reason: 'Queue paused: {reason}',
+  queue_clear_finished: 'Clear finished',
+  queue_bytes: '{received} / {total}',
+
+  folder_label: 'Save folder',
+  folder_set: 'Large files are saved to your chosen folder.',
+  folder_unset: 'No folder chosen — large files use browser downloads.',
+  folder_pick: 'Choose folder',
+  folder_change: 'Change folder',
+  folder_clear: 'Forget folder',
+
+  crawl_start: 'Scan whole chat',
+  crawl_until: 'Stop at date (optional)',
+  crawl_pause: 'Pause',
+  crawl_resume: 'Resume',
+  crawl_stop: 'Stop',
+  crawl_status_idle: 'Idle',
+  crawl_status_running: 'Scanning…',
+  crawl_status_paused: 'Paused',
+  crawl_status_done: 'Finished',
+  crawl_status_error: 'Error',
+  crawl_progress: '{steps} step(s) · {found} item(s) found',
+  crawl_oldest: 'Reached {date}',
+
+  health_title: 'Telegram’s layout may have changed',
+  health_body: 'Some features may not work until the extension is updated.',
+  health_failed: 'Failed checks: {checks}',
+  health_dismiss: 'Dismiss warning',
+} as const;
+
+export const uiTr: Readonly<Record<keyof typeof uiEn, string>> = {
+  section_media: 'Medya',
+  section_crawl: 'Tüm sohbeti tara',
+
+  filter_types_label: 'Medya türleri',
+  filter_date_label: 'Tarih',
+  filter_scope_label: 'Kapsam',
+  filter_scope_all: 'Tüm sohbetler',
+  filter_scope_current: 'Bu sohbet',
+  filter_hide_downloaded: 'İndirilenleri gizle',
+  filter_reset: 'Filtreleri sıfırla',
+
+  grid_label: 'Medya öğeleri',
+  grid_empty: 'Gösterilecek medya yok',
+  grid_hint:
+    'Seçmek için tıklayın, aralık için Shift+tıklayın, sohbette göstermek için çift tıklayın.',
+  grid_type_photo: 'Fotoğraf',
+  grid_type_video: 'Video',
+  grid_type_gif: 'GIF',
+  grid_type_document: 'Dosya',
+  grid_type_audio: 'Ses',
+  grid_downloaded: 'İndirildi',
+  grid_locate: 'Sohbette göster',
+
+  queue_pause: 'Duraklat',
+  queue_resume: 'Devam et',
+  queue_paused: 'Kuyruk duraklatıldı',
+  queue_paused_reason: 'Kuyruk duraklatıldı: {reason}',
+  queue_clear_finished: 'Bitenleri temizle',
+  queue_bytes: '{received} / {total}',
+
+  folder_label: 'Kayıt klasörü',
+  folder_set: 'Büyük dosyalar seçtiğiniz klasöre kaydedilir.',
+  folder_unset: 'Klasör seçilmedi — büyük dosyalar tarayıcı indirmesiyle iner.',
+  folder_pick: 'Klasör seç',
+  folder_change: 'Klasörü değiştir',
+  folder_clear: 'Klasörü unut',
+
+  crawl_start: 'Tüm sohbeti tara',
+  crawl_until: 'Bu tarihte dur (isteğe bağlı)',
+  crawl_pause: 'Duraklat',
+  crawl_resume: 'Devam et',
+  crawl_stop: 'Durdur',
+  crawl_status_idle: 'Beklemede',
+  crawl_status_running: 'Taranıyor…',
+  crawl_status_paused: 'Duraklatıldı',
+  crawl_status_done: 'Tamamlandı',
+  crawl_status_error: 'Hata',
+  crawl_progress: '{steps} adım · {found} öğe bulundu',
+  crawl_oldest: '{date} tarihine ulaşıldı',
+
+  health_title: 'Telegram’ın arayüzü değişmiş olabilir',
+  health_body: 'Eklenti güncellenene kadar bazı özellikler çalışmayabilir.',
+  health_failed: 'Başarısız kontroller: {checks}',
+  health_dismiss: 'Uyarıyı kapat',
+};

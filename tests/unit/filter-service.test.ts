@@ -65,6 +65,53 @@ describe('FilterService', () => {
     expect(service.apply(items, { ...baseFilters, dateRange: 'today' })).toHaveLength(0);
   });
 
+  it('scope currentChat keeps only items of the current peer', () => {
+    const items = [
+      makeItem({ id: 'here', peerId: '42' }),
+      makeItem({ id: 'there', peerId: '7' }),
+      makeItem({ id: 'unknown' }),
+    ];
+    const filters = { ...baseFilters, scope: 'currentChat' as const };
+    expect(
+      service.apply(items, filters, { currentPeerId: '42' }).map((i) => i.id),
+    ).toEqual(['here']);
+    // No open chat known: scope is not applied.
+    expect(service.apply(items, filters, {})).toHaveLength(3);
+    expect(service.apply(items, filters)).toHaveLength(3);
+    // Scope 'all' ignores the current peer.
+    expect(service.apply(items, baseFilters, { currentPeerId: '42' })).toHaveLength(3);
+  });
+
+  it('hideDownloaded drops items recorded as downloaded', () => {
+    const items = [makeItem({ id: 'done' }), makeItem({ id: 'new' })];
+    const isDownloaded = (id: string) => id === 'done';
+    expect(
+      service
+        .apply(items, { ...baseFilters, hideDownloaded: true }, { isDownloaded })
+        .map((i) => i.id),
+    ).toEqual(['new']);
+    expect(service.apply(items, baseFilters, { isDownloaded })).toHaveLength(2);
+    // Without a lookup nothing can be hidden.
+    expect(service.apply(items, { ...baseFilters, hideDownloaded: true })).toHaveLength(
+      2,
+    );
+  });
+
+  it('combines type, scope and hideDownloaded filters', () => {
+    const items = [
+      makeItem({ id: 'a', type: 'photo', peerId: '1' }),
+      makeItem({ id: 'b', type: 'video', peerId: '1' }),
+      makeItem({ id: 'c', type: 'photo', peerId: '2' }),
+      makeItem({ id: 'd', type: 'photo', peerId: '1' }),
+    ];
+    const result = service.apply(
+      items,
+      { ...baseFilters, types: ['photo'], scope: 'currentChat', hideDownloaded: true },
+      { currentPeerId: '1', isDownloaded: (id) => id === 'd' },
+    );
+    expect(result.map((i) => i.id)).toEqual(['a']);
+  });
+
   it('matches() validates a single item', () => {
     const item = makeItem({ id: 'p', type: 'photo' });
     expect(service.matches(item, { ...baseFilters, types: ['photo'] })).toBe(true);

@@ -23,15 +23,17 @@ export class SearchService {
     return hits;
   }
 
+  /** Matching items, best first. An empty query returns a copy in original order. */
   filter(items: readonly MediaItem[], query: string, threshold = 0.3): MediaItem[] {
+    if (query.trim().length === 0) return items.slice();
     return this.search(items, query, threshold).map((hit) => hit.item);
   }
 
   private scoreItem(item: MediaItem, query: string): number {
-    const fields = [item.fileName ?? '', item.type, item.date ?? ''];
+    const fields = [item.fileName, item.type, item.date, item.chatTitle];
     let best = 0;
     for (const field of fields) {
-      if (field.length === 0) continue;
+      if (field === undefined || field.length === 0) continue;
       const score = fuzzyScore(query, field);
       if (score > best) best = score;
       if (best === 1) break;

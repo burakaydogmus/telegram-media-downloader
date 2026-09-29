@@ -1,6 +1,9 @@
 import { StubViewModelBase } from '../helpers/stub-view-model-base.js';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PanelComponent } from '../../src/ui/components/panel.component.js';
+import { UI_TAGS } from '../../src/ui/components/tags.js';
+import { HarnessVM, installFrameMock, type FrameMock } from './ui-harness.js';
+import type { PanelState, SelectorHealthReport } from '../../src/shared/types/index.js';
 import { TAGS, DEFAULT_PANEL_STATE } from '../../src/shared/constants/index.js';
 import type {
   PanelViewModel,
@@ -191,5 +194,184 @@ describe('PanelComponent (integration)', () => {
     )[0] as HTMLButtonElement;
     rescanBtn.click();
     expect(vm.rescanCalled).toBe(1);
+  });
+
+  it('places the media grid between Filters and Selection, crawl before queue', () => {
+    const panel = mountPanel(new StubViewModel());
+    const order = [...panel.shadowRoot!.querySelector('.panel__body')!.children].map(
+      (c) => c.tagName.toLowerCase(),
+    );
+    expect(order).toEqual([
+      TAGS.statistics,
+      TAGS.search,
+      TAGS.filters,
+      UI_TAGS.mediaGrid,
+      TAGS.selection,
+      UI_TAGS.crawl,
+      TAGS.queue,
+      TAGS.logs,
+    ]);
+  });
+
+  it('adopts one shared constructable stylesheet across all components', () => {
+    const panel = mountPanel(new StubViewModel());
+    const sections = [...panel.shadowRoot!.querySelector('.panel__body')!.children];
+    const firstSheets = sections.map((s) => s.shadowRoot!.adoptedStyleSheets[0]);
+    expect(firstSheets[0]).toBeInstanceOf(CSSStyleSheet);
+    expect(new Set(firstSheets).size).toBe(1);
+    expect(panel.shadowRoot!.adoptedStyleSheets[0]).toBe(firstSheets[0]);
+    expect(sections[0]!.shadowRoot!.querySelector('style')).toBeNull();
+  });
+});
+
+describe('PanelComponent shell behaviour', () => {
+  let frames: FrameMock;
+  beforeEach(() => {
+    frames = installFrameMock();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    frames.restore();
+    setViewport(1024, 768);
+  });
+
+  function setViewport(width: number, height: number): void {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
+  }
+
+  const failingHealth = (): SelectorHealthReport => ({
+    client: 'webk',
+    ok: false,
+    checkedAt: 1,
+    checks: [
+      { name: 'chat', selector: '.chat', matched: false, critical: true },
+      { name: 'bubbles', selector: '.bubbles', matched: true, critical: true },
+      { name: 'menu', selector: '.menu', matched: false, critical: false },
+    ],
+  });
+
+  it('shows a dismissible health warning listing failed critical checks', () => {
+    const vm = new HarnessVM();
+    const panel = mountPanel(vm);
+    const banner = panel.shadowRoot!.querySelector<HTMLElement>('.health')!;
+    expect(banner.hidden).toBe(true);
+
+    vm.health = failingHealth();
+    vm.emit('health');
+    frames.flush();
+    expect(banner.hidden).toBe(false);
+    expect(banner.textContent).toContain('layout may have changed');
+    expect(banner.textContent).toContain('Failed checks: chat');
+    expect(banner.textContent).not.toContain('menu');
+
+    banner.querySelector<HTMLButtonElement>('[aria-label="Dismiss warning"]')!.click();
+    expect(banner.hidden).toBe(true);
+    vm.emit('health');
+    frames.flush();
+    expect(banner.hidden).toBe(true);
+
+    vm.health = {
+      ...failingHealth(),
+      checks: [{ name: 'bubbles', selector: '.b', matched: false, critical: true }],
+    };
+    vm.emit('health');
+    frames.flush();
+    expect(banner.hidden).toBe(false);
+    expect(banner.textContent).toContain('Failed checks: bubbles');
+
+    vm.health = { ...failingHealth(), ok: true };
+    vm.emit('health');
+    frames.flush();
+    expect(banner.hidden).toBe(true);
+  });
+
+  it('re-clamps into the viewport on (debounced) window resize and persists', () => {
+    setViewport(1200, 900);
+    const vm = new HarnessVM();
+    const saved: PanelState[] = [];
+    const panel = new PanelComponent();
+    panel.viewModel = vm;
+    panel.configure({ x: 800, y: 700, collapsed: false, visible: true }, (s) =>
+      saved.push(s),
+    );
+    document.body.appendChild(panel.host);
+    panel.connect();
+    expect(panel.host.style.transform).toBe('translate(800px, 700px)');
+
+    setViewport(600, 400);
+    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('resize'));
+    expect(panel.host.style.transform).toBe('translate(800px, 700px)');
+    vi.advanceTimersByTime(500);
+    expect(panel.host.style.transform).toBe('translate(260px, 280px)');
+    expect(saved.at(-1)).toMatchObject({ x: 260, y: 280 });
+
+    panel.disconnect();
+    setViewport(300, 200);
+    window.dispatchEvent(new Event('resize'));
+    vi.advanceTimersByTime(500);
+    expect(panel.host.style.transform).toBe('translate(260px, 280px)');
+  });
+
+  it('re-clamps after un-collapsing and keeps sections mounted', () => {
+    setViewport(1000, 800);
+    const vm = new HarnessVM();
+    const panel = mountPanel(vm);
+    const grid = panel.shadowRoot!.querySelector(UI_TAGS.mediaGrid);
+    const collapse = panel.shadowRoot!.querySelectorAll<HTMLButtonElement>(
+      '.panel__header .icon-btn',
+    )[1]!;
+    collapse.click();
+    expect(collapse.getAttribute('aria-expanded')).toBe('false');
+    expect(collapse.getAttribute('aria-label')).toBe('Expand panel');
+    setViewport(200, 100);
+    collapse.click();
+    expect(panel.host.style.transform).toBe('translate(0px, 0px)');
+    expect(panel.shadowRoot!.querySelector(UI_TAGS.mediaGrid)).toBe(grid);
+  });
+
+  it('re-renders labels on language change without replacing sections', () => {
+    const vm = new HarnessVM();
+    const panel = mountPanel(vm);
+    const body = panel.shadowRoot!.querySelector('.panel__body')!;
+    const hosts = [...body.children];
+    vm.i18n.setLanguage('tr');
+    expect([...body.children]).toEqual(hosts);
+    const filters = panel.shadowRoot!.querySelector(TAGS.filters)!;
+    expect(filters.shadowRoot!.textContent).toContain('Bu sohbet');
+    expect(
+      panel
+        .shadowRoot!.querySelectorAll('.panel__header .icon-btn')[1]!
+        .getAttribute('aria-label'),
+    ).toBe(vm.i18n.t('panel_collapse'));
+    expect(vm.i18n.t('panel_collapse')).not.toBe('Collapse panel');
+  });
+
+  it('drags the panel with pointer capture', () => {
+    setViewport(1200, 900);
+    const vm = new HarnessVM();
+    const panel = mountPanel(vm);
+    const header = panel.shadowRoot!.querySelector<HTMLElement>('.panel__header')!;
+    const capture = vi.fn();
+    header.setPointerCapture = capture;
+    const pointer = (type: string, x: number, y: number) =>
+      header.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          pointerId: 7,
+          clientX: x,
+          clientY: y,
+        }),
+      );
+    pointer('pointerdown', 34, 106);
+    expect(capture).toHaveBeenCalledWith(7);
+    pointer('pointermove', 134, 206);
+    expect(panel.host.style.transform).toBe('translate(124px, 196px)');
+    pointer('pointerup', 134, 206);
+    pointer('pointermove', 500, 500);
+    expect(panel.host.style.transform).toBe('translate(124px, 196px)');
   });
 });
