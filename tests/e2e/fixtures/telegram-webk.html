@@ -10,6 +10,8 @@
       }
       .bubbles {
         padding: 16px;
+      }
+      .bubbles-date-group {
         display: flex;
         flex-direction: column;
         gap: 12px;
@@ -19,36 +21,136 @@
         padding: 8px;
         border-radius: 8px;
       }
-      img.media-photo {
+      .album {
+        display: flex;
+        gap: 4px;
+      }
+      img.media-photo,
+      video.media-video {
         width: 80px;
         height: 60px;
         display: block;
       }
     </style>
   </head>
-  <body>
-    <!-- DOM signatures the detector and scanner look for on Web K. -->
-    <div id="column-center">
-      <div class="bubbles scrollable">
-        <div class="bubble" data-mid="1">
-          <img
-            class="media-photo"
-            src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
-          />
-          <time datetime="2026-06-19T10:00:00Z">10:00</time>
+  <body class="is-shown">
+    <!--
+      Mirrors the Web K structure the detector, scanner and selector self-test
+      rely on: #page-chats.whole > #main-columns > #column-center > .chat >
+      .bubbles > .bubbles-inner > .bubbles-date-group > .bubble[data-mid].
+      Media sources are inline data URIs so the page works fully offline.
+    -->
+    <div id="page-chats" class="whole">
+      <div id="main-columns">
+        <div class="chatlist-container">
+          <ul class="chatlist">
+            <li class="chatlist-chat" data-peer-id="-1001234567890">Fixture Channel</li>
+          </ul>
         </div>
-        <div class="bubble" data-mid="2">
-          <img
-            class="media-photo"
-            src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
-          />
-          <time datetime="2026-06-18T09:00:00Z">09:00</time>
-        </div>
-        <div class="bubble" data-mid="3">
-          <div class="document">
-            <a href="data:text/plain;base64,aGVsbG8gd29ybGQ="></a>
-            <div class="document-name">notes.txt</div>
-            <div class="document-size">1.0 KB</div>
+        <div id="column-center">
+          <div class="chat" data-peer-id="-1001234567890">
+            <div class="chat-info"><span class="peer-title">Fixture Channel</span></div>
+            <div class="bubbles scrollable">
+              <div class="bubbles-inner">
+                <section class="bubbles-date-group">
+                  <div
+                    class="bubble is-in"
+                    data-mid="1"
+                    data-peer-id="-1001234567890"
+                    data-timestamp="1781863200"
+                  >
+                    <div class="bubble-content">
+                      <div class="attachment media-container">
+                        <img
+                          class="media-photo"
+                          alt=""
+                          src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                        />
+                      </div>
+                      <time datetime="2026-06-19T10:00:00Z">10:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="bubble is-in is-album"
+                    data-mid="2"
+                    data-peer-id="-1001234567890"
+                    data-timestamp="1781773200"
+                  >
+                    <div class="bubble-content">
+                      <div class="attachment album">
+                        <div class="album-item grouped-item" data-mid="2">
+                          <img
+                            class="media-photo"
+                            alt=""
+                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+                          />
+                        </div>
+                        <div class="album-item grouped-item" data-mid="3">
+                          <img
+                            class="media-photo"
+                            alt=""
+                            src="data:image/gif;base64,R0lGODlhAQABAPAAAP8AAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                          />
+                        </div>
+                      </div>
+                      <time datetime="2026-06-18T09:00:00Z">09:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="bubble is-in"
+                    data-mid="4"
+                    data-peer-id="-1001234567890"
+                    data-timestamp="1781683200"
+                  >
+                    <div class="bubble-content">
+                      <div class="attachment media-container">
+                        <video
+                          class="media-video"
+                          muted
+                          playsinline
+                          preload="none"
+                          poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                          src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28y"
+                        ></video>
+                        <span class="video-time">0:07</span>
+                      </div>
+                      <time datetime="2026-06-17T08:00:00Z">08:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="bubble is-in"
+                    data-mid="5"
+                    data-peer-id="-1001234567890"
+                    data-timestamp="1781593200"
+                  >
+                    <div class="bubble-content">
+                      <div class="document-container">
+                        <div class="document ext-txt">
+                          <a href="data:text/plain;base64,aGVsbG8gd29ybGQ="></a>
+                          <div class="document-name">notes.txt</div>
+                          <div class="document-size">1.0 KB</div>
+                        </div>
+                      </div>
+                      <time datetime="2026-06-16T07:00:00Z">07:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="bubble is-out"
+                    data-mid="6"
+                    data-peer-id="-1001234567890"
+                    data-timestamp="1781593300"
+                  >
+                    <div class="bubble-content">
+                      <div class="message">Text-only message without media.</div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
           </div>
         </div>
       </div>

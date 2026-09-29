@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Telegram Web A (E2E fixture)</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 0;
+      }
+      .MessageList {
+        padding: 16px;
+      }
+      .Message {
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      .media-inner img,
+      .media-inner video {
+        width: 80px;
+        height: 60px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      Mirrors the Web A structure: #root > #Main.Main > #MiddleColumn >
+      .messages-layout > .MessageList > .messages-container >
+      .message-date-group > .Message.message-list-item[data-message-id].
+    -->
+    <div id="root">
+      <div id="Main" class="Main">
+        <div id="LeftColumn"><div class="chat-list"></div></div>
+        <div id="MiddleColumn">
+          <div class="messages-layout">
+            <div class="MessageList custom-scroll">
+              <div class="messages-container">
+                <div class="message-date-group">
+                  <div
+                    class="Message message-list-item"
+                    id="message-101"
+                    data-message-id="101"
+                  >
+                    <div class="message-content-wrapper">
+                      <div class="media-inner">
+                        <img
+                          class="full-media"
+                          alt=""
+                          src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                        />
+                      </div>
+                      <time datetime="2026-06-19T10:00:00Z">10:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="Message message-list-item"
+                    id="message-102"
+                    data-message-id="102"
+                  >
+                    <div class="message-content-wrapper">
+                      <div class="Album">
+                        <div class="media-inner">
+                          <img
+                            class="full-media"
+                            alt=""
+                            src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+                          />
+                        </div>
+                        <div class="media-inner">
+                          <img
+                            class="full-media"
+                            alt=""
+                            src="data:image/gif;base64,R0lGODlhAQABAPAAAP8AAP///yH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+                          />
+                        </div>
+                      </div>
+                      <time datetime="2026-06-18T09:00:00Z">09:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="Message message-list-item"
+                    id="message-103"
+                    data-message-id="103"
+                  >
+                    <div class="message-content-wrapper">
+                      <div class="media-inner">
+                        <video
+                          muted
+                          playsinline
+                          preload="none"
+                          poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                          src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28y"
+                        ></video>
+                      </div>
+                      <time datetime="2026-06-17T08:00:00Z">08:00</time>
+                    </div>
+                  </div>
+
+                  <div
+                    class="Message message-list-item"
+                    id="message-104"
+                    data-message-id="104"
+                  >
+                    <div class="message-content-wrapper">
+                      <div class="File">
+                        <div class="file-info">
+                          <div class="File-name">report.pdf</div>
+                          <div class="File-size">2.4 MB</div>
+                        </div>
+                      </div>
+                      <time datetime="2026-06-16T07:00:00Z">07:00</time>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

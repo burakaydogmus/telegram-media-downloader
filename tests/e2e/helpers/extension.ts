@@ -3,18 +3,29 @@ import { readFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { chromium, type BrowserContext, type Worker } from '@playwright/test';
+import type { ContentState, MessageResponse } from '../../../src/shared/types/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../..');
 export const DIST_PATH = resolve(ROOT, 'dist');
-export const FIXTURE_HTML = readFileSync(
-  resolve(__dirname, '../fixtures/telegram-webk.html'),
-  'utf-8',
-);
 
-export async function launchWithExtension(): Promise<BrowserContext> {
+function readFixture(name: string): string {
+  return readFileSync(resolve(__dirname, '../fixtures', name), 'utf-8');
+}
+
+export const FIXTURE_HTML = readFixture('telegram-webk.html');
+export const FIXTURE_WEBA_HTML = readFixture('telegram-weba.html');
+
+export interface LaunchOptions {
+  /** Reuse a profile (e.g. a pre-logged-in one); defaults to a fresh temp dir. */
+  readonly userDataDir?: string;
+}
+
+export async function launchWithExtension(
+  options: LaunchOptions = {},
+): Promise<BrowserContext> {
   const headed = process.env.PWHEAD === '1';
-  const userDataDir = mkdtempSync(join(tmpdir(), 'tgmd-e2e-'));
+  const userDataDir = options.userDataDir ?? mkdtempSync(join(tmpdir(), 'tgmd-e2e-'));
   return chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: [
@@ -39,12 +50,43 @@ export function extensionIdFromWorker(worker: Worker): string {
   return match[1];
 }
 
+/** Serves the Web A fixture under `/a/…` and the Web K fixture everywhere else. */
 export async function routeTelegram(context: BrowserContext): Promise<void> {
   await context.route('https://web.telegram.org/**', async (route) => {
+    const path = new URL(route.request().url()).pathname;
     await route.fulfill({
       status: 200,
       contentType: 'text/html; charset=utf-8',
-      body: FIXTURE_HTML,
+      body: path.startsWith('/a') ? FIXTURE_WEBA_HTML : FIXTURE_HTML,
     });
   });
+}
+
+/**
+ * Asks the content script in the first Telegram tab for its `GET_STATE`,
+ * from an extension page (which has `chrome.tabs`).
+ */
+export async function getContentState(
+  context: BrowserContext,
+): Promise<MessageResponse<ContentState>> {
+  const id = extensionIdFromWorker(await getServiceWorker(context));
+  const page = await context.newPage();
+  try {
+    await page.goto(`chrome-extension://${id}/src/options/options.html`);
+    return await page.evaluate(async () => {
+      const [tab] = await chrome.tabs.query({ url: 'https://web.telegram.org/*' });
+      if (tab?.id === undefined) return { ok: false, error: 'No Telegram tab' };
+      try {
+        return (await chrome.tabs.sendMessage(tab.id, { type: 'GET_STATE' })) as {
+          ok: boolean;
+          data?: ContentState;
+          error?: string;
+        };
+      } catch (error) {
+        return { ok: false, error: String(error) };
+      }
+    });
+  } finally {
+    await page.close();
+  }
 }
