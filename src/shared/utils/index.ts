@@ -4,3 +4,5 @@ export * from './events.js';
 export * from './format.js';
 export * from './fuzzy.js';
 export * from './id.js';
+export * from './media-key.js';
+export * from './idb.js';

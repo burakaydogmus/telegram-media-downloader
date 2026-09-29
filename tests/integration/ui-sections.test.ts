@@ -1,3 +1,4 @@
+import { StubViewModelBase } from '../helpers/stub-view-model-base.js';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { QueueSection } from '../../src/ui/components/queue-section.js';
 import { LogsSection } from '../../src/ui/components/logs-section.js';
@@ -20,7 +21,7 @@ import type { LogEntry } from '../../src/shared/logger/index.js';
 import { I18n } from '../../src/shared/i18n/index.js';
 import { DEFAULT_FILTERS } from '../../src/shared/constants/index.js';
 
-class Stub implements PanelViewModel {
+class Stub extends StubViewModelBase implements PanelViewModel {
   readonly i18n = new I18n('en');
   tasks: DownloadTask[] = [];
   logs: LogEntry[] = [];
@@ -59,6 +60,7 @@ class Stub implements PanelViewModel {
       queued: this.tasks.filter((t) => t.state === 'queued').length,
       cancelled: this.tasks.filter((t) => t.state === 'cancelled').length,
       overallProgress: this.tasks.length ? completed / this.tasks.length : 0,
+      paused: false,
     };
   }
   getLogs(): readonly LogEntry[] {

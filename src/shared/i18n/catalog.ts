@@ -1,6 +1,11 @@
 import type { Language } from '../types/index.js';
+import { downloadEn, downloadTr } from './catalogs/download.js';
+import { uiEn, uiTr } from './catalogs/ui.js';
+import { crawlEn, crawlTr } from './catalogs/crawl.js';
+import { healthEn, healthTr } from './catalogs/health.js';
+import { settingsEn, settingsTr } from './catalogs/settings.js';
 
-const en = {
+const baseEn = {
   panel_title: 'Media Downloader',
   panel_collapse: 'Collapse panel',
   panel_expand: 'Expand panel',
@@ -99,10 +104,19 @@ const en = {
   popup_rescan: 'Rescan media',
 } as const;
 
+const en = {
+  ...baseEn,
+  ...downloadEn,
+  ...uiEn,
+  ...crawlEn,
+  ...healthEn,
+  ...settingsEn,
+} as const;
+
 export type TranslationKey = keyof typeof en;
 export type Catalog = Readonly<Record<TranslationKey, string>>;
 
-const tr: Catalog = {
+const baseTr: Readonly<Record<keyof typeof baseEn, string>> = {
   panel_title: 'Medya İndirici',
   panel_collapse: 'Paneli daralt',
   panel_expand: 'Paneli genişlet',
@@ -199,6 +213,15 @@ const tr: Catalog = {
   popup_status_inactive: 'Telegram Web’de değil',
   popup_toggle_panel: 'Paneli aç/kapat',
   popup_rescan: 'Medyayı yeniden tara',
+};
+
+const tr: Catalog = {
+  ...baseTr,
+  ...downloadTr,
+  ...uiTr,
+  ...crawlTr,
+  ...healthTr,
+  ...settingsTr,
 };
 
 export const CATALOGS: Readonly<Record<Language, Catalog>> = {

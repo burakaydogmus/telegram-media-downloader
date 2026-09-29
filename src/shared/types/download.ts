@@ -19,7 +19,17 @@ export interface DownloadTask {
 
   attempts: number;
 
+  /** Epoch ms before which a queued retry must not start (backoff). */
+  nextAttemptAt?: number;
+
   chromeDownloadId?: number;
+
+  bytesReceived?: number;
+
+  totalBytes?: number;
+
+  /** Final path reported by chrome.downloads, when known. */
+  savedPath?: string;
 
   error?: string;
   readonly createdAt: number;
@@ -36,4 +46,8 @@ export interface QueueSnapshot {
   readonly cancelled: number;
 
   readonly overallProgress: number;
+
+  /** Queue is paused (manually or automatically, e.g. on FLOOD_WAIT). */
+  readonly paused: boolean;
+  readonly pauseReason?: string;
 }

@@ -1,3 +1,4 @@
+import { StubViewModelBase } from '../helpers/stub-view-model-base.js';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PanelComponent } from '../../src/ui/components/panel.component.js';
 import { TAGS, DEFAULT_PANEL_STATE } from '../../src/shared/constants/index.js';
@@ -15,7 +16,7 @@ import type { LogEntry } from '../../src/shared/logger/index.js';
 import { I18n } from '../../src/shared/i18n/index.js';
 import { DEFAULT_FILTERS } from '../../src/shared/constants/index.js';
 
-class StubViewModel implements PanelViewModel {
+class StubViewModel extends StubViewModelBase implements PanelViewModel {
   readonly i18n = new I18n('en');
   selectAllCalled = 0;
   rescanCalled = 0;
@@ -50,6 +51,7 @@ class StubViewModel implements PanelViewModel {
       queued: 0,
       cancelled: 0,
       overallProgress: 0,
+      paused: false,
     };
   }
   getLogs(): readonly LogEntry[] {

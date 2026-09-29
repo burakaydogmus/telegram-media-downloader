@@ -81,6 +81,7 @@ function readForm(): Settings {
   ) as LogLevel;
 
   return {
+    ...DEFAULT_SETTINGS,
     autoScan: checkbox('autoScan').checked,
     theme,
     language,

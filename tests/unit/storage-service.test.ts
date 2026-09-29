@@ -25,11 +25,19 @@ describe('StorageService', () => {
 
   it('round-trips filters and panel state', async () => {
     const storage = build();
-    await storage.saveFilters({ types: ['photo'], dateRange: 'today', query: 'x' });
+    await storage.saveFilters({
+      types: ['photo'],
+      dateRange: 'today',
+      query: 'x',
+      scope: 'all',
+      hideDownloaded: false,
+    });
     expect(await storage.getFilters()).toEqual({
       types: ['photo'],
       dateRange: 'today',
       query: 'x',
+      scope: 'all',
+      hideDownloaded: false,
     });
 
     await storage.savePanelState({ x: 10, y: 20, collapsed: true, visible: false });

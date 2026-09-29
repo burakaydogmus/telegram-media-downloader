@@ -8,6 +8,8 @@ const baseFilters: FilterState = {
   types: ['photo', 'video', 'gif', 'document', 'audio'],
   dateRange: 'all',
   query: '',
+  scope: 'all',
+  hideDownloaded: false,
 };
 
 describe('FilterService', () => {

@@ -170,6 +170,7 @@ export class DownloadQueue {
       queued,
       cancelled,
       overallProgress: tasks.length === 0 ? 0 : progressSum / tasks.length,
+      paused: false,
     };
   }
 

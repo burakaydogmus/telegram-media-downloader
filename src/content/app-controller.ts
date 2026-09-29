@@ -6,6 +6,10 @@ import type {
   DateRange,
   QueueSnapshot,
   Settings,
+  FilterScope,
+  CrawlOptions,
+  CrawlState,
+  SelectorHealthReport,
 } from '../shared/types/index.js';
 import type { LogEntry, ILogger } from '../shared/logger/index.js';
 import type { II18n } from '../shared/i18n/index.js';
@@ -315,6 +319,71 @@ export class AppController implements PanelViewModel {
 
   private emit(event: PanelEvent): void {
     this.emitter.emit('panel', event);
+  }
+
+  // ---------------------------------------------------------------------
+  // Contract members added for the next iteration. The integration step
+  // replaces these placeholder bodies with real wiring.
+  // ---------------------------------------------------------------------
+
+  isDownloaded(_id: string): boolean {
+    return false;
+  }
+
+  getCurrentPeerId(): string | undefined {
+    return undefined;
+  }
+
+  setScope(scope: FilterScope): void {
+    this.filters = { ...this.filters, scope };
+    this.persistFilters(this.filters);
+    this.recomputeVisible();
+    this.emit('filters');
+    this.emit('media');
+  }
+
+  setHideDownloaded(value: boolean): void {
+    this.filters = { ...this.filters, hideDownloaded: value };
+    this.persistFilters(this.filters);
+    this.recomputeVisible();
+    this.emit('filters');
+    this.emit('media');
+  }
+
+  selectRange(_anchorId: string, _targetId: string): void {}
+
+  pauseQueue(): void {}
+
+  resumeQueue(): void {}
+
+  revealItem(_id: string): void {}
+
+  getCrawlState(): CrawlState {
+    return { status: 'idle', steps: 0, foundItems: 0 };
+  }
+
+  startCrawl(_options?: CrawlOptions): void {}
+
+  pauseCrawl(): void {}
+
+  resumeCrawl(): void {}
+
+  stopCrawl(): void {}
+
+  hasDownloadDirectory(): boolean {
+    return false;
+  }
+
+  pickDownloadDirectory(): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  clearDownloadDirectory(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  getHealth(): SelectorHealthReport | null {
+    return null;
   }
 
   resetFilters(): void {

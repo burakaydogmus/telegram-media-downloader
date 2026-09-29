@@ -3,6 +3,11 @@ export const MEDIA_TYPES = ['photo', 'video', 'gif', 'document', 'audio'] as con
 export type MediaType = (typeof MEDIA_TYPES)[number];
 
 export interface MediaItem {
+  /**
+   * Stable identity. Derived from `peerId + messageId + albumIndex + type`
+   * (see `mediaKey`), never from the URL — URLs change (thumb → full blob,
+   * per-session blob URLs) and must not create duplicates.
+   */
   readonly id: string;
 
   readonly type: MediaType;
@@ -15,6 +20,9 @@ export interface MediaItem {
 
   readonly messageId?: string;
 
+  /** Position inside an album/grouped message (0 for single media). */
+  readonly albumIndex?: number;
+
   readonly url?: string;
 
   readonly thumbnailUrl?: string;
@@ -24,6 +32,11 @@ export interface MediaItem {
   readonly timestamp?: number;
 
   readonly peerId?: string;
+
+  /** Human-readable chat title, used by file-name templates. */
+  readonly chatTitle?: string;
+
+  readonly mimeType?: string;
 }
 
 export type MediaItemPatch = Partial<Omit<MediaItem, 'id'>>;

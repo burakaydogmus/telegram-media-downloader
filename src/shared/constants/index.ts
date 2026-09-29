@@ -31,6 +31,23 @@ export const PERF = {
   maxLogEntries: 1000,
 
   downloadPollMs: 500,
+
+  /** Base delay for exponential retry backoff in the download queue. */
+  retryBaseDelayMs: 1000,
+
+  /** Upper bound for a single retry backoff. */
+  retryMaxDelayMs: 30_000,
+} as const;
+
+/** IndexedDB database used for large/structured persistence. */
+export const IDB = {
+  name: 'tg-media-downloader',
+  version: 1,
+  stores: {
+    history: 'downloadHistory',
+    crawl: 'crawlCheckpoints',
+    handles: 'fileHandles',
+  },
 } as const;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -40,12 +57,20 @@ export const DEFAULT_SETTINGS: Settings = {
   logLevel: 'info',
   maxConcurrentDownloads: 3,
   maxRetries: 3,
+  downloadDelayMs: 800,
+  downloadJitterMs: 600,
+  fileNameTemplate: 'Telegram/{chat}/{date}_{msgId}_{index}_{name}',
+  preferNativeDownload: true,
+  largeFileThresholdMb: 200,
+  skipDownloaded: true,
 };
 
 export const DEFAULT_FILTERS: FilterState = {
   types: ['photo', 'video', 'gif', 'document', 'audio'],
   dateRange: 'all',
   query: '',
+  scope: 'currentChat',
+  hideDownloaded: false,
 };
 
 export const DEFAULT_PANEL_STATE: PanelState = {
