@@ -173,7 +173,7 @@ export class PanelComponent extends BaseComponent {
         createElement('div', {
           className: 'health__text',
           children: [
-            createElement('strong', { text: t('health_title') }),
+            createElement('strong', { text: t('panel_health_title') }),
             createElement('div', { text: t('health_body') }),
             failed,
           ],

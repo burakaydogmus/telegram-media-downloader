@@ -52,7 +52,7 @@ export const uiEn = {
   crawl_progress: '{steps} step(s) · {found} item(s) found',
   crawl_oldest: 'Reached {date}',
 
-  health_title: 'Telegram’s layout may have changed',
+  panel_health_title: 'Telegram’s layout may have changed',
   health_body: 'Some features may not work until the extension is updated.',
   health_failed: 'Failed checks: {checks}',
   health_dismiss: 'Dismiss warning',
@@ -109,7 +109,7 @@ export const uiTr: Readonly<Record<keyof typeof uiEn, string>> = {
   crawl_progress: '{steps} adım · {found} öğe bulundu',
   crawl_oldest: '{date} tarihine ulaşıldı',
 
-  health_title: 'Telegram’ın arayüzü değişmiş olabilir',
+  panel_health_title: 'Telegram’ın arayüzü değişmiş olabilir',
   health_body: 'Eklenti güncellenene kadar bazı özellikler çalışmayabilir.',
   health_failed: 'Başarısız kontroller: {checks}',
   health_dismiss: 'Uyarıyı kapat',
