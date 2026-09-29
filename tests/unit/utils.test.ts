@@ -9,7 +9,14 @@ import {
 } from '../../src/shared/utils/format.js';
 import { hashString, randomId } from '../../src/shared/utils/id.js';
 import { TypedEmitter } from '../../src/shared/utils/events.js';
-import { debounce, delay, retry } from '../../src/shared/utils/async.js';
+import {
+  debounce,
+  delay,
+  retry,
+  abortableDelay,
+  isAbortError,
+  nextFrame,
+} from '../../src/shared/utils/async.js';
 
 describe('fuzzy', () => {
   it('scores exact matches highest', () => {
@@ -127,5 +134,21 @@ describe('async', () => {
         { retries: 1, baseDelayMs: 1 },
       ),
     ).rejects.toThrow('always');
+  });
+  it('abortableDelay resolves after the delay', async () => {
+    await expect(abortableDelay(1)).resolves.toBeUndefined();
+  });
+  it('abortableDelay rejects on abort', async () => {
+    const controller = new AbortController();
+    const pending = abortableDelay(10_000, controller.signal);
+    controller.abort();
+    await expect(pending).rejects.toSatisfy(isAbortError);
+    const aborted = new AbortController();
+    aborted.abort();
+    await expect(abortableDelay(1, aborted.signal)).rejects.toSatisfy(isAbortError);
+  });
+  it('nextFrame resolves with or without rAF', async () => {
+    await expect(nextFrame(null, 1)).resolves.toBeUndefined();
+    await expect(nextFrame(window)).resolves.toBeUndefined();
   });
 });
