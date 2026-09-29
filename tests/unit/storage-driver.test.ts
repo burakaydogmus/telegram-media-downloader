@@ -21,6 +21,21 @@ describe('MemoryStorageDriver', () => {
     expect(await driver.get('x')).toBeUndefined();
   });
 
+  it('notifies watchers on set, remove and clear', async () => {
+    const driver = new MemoryStorageDriver();
+    const seen: unknown[] = [];
+    const off = driver.watch('k', (v) => seen.push(v));
+    await driver.set('k', { a: 1 });
+    await driver.set('other', 1);
+    await driver.remove('k');
+    await driver.remove('k');
+    await driver.set('k', 2);
+    await driver.clear();
+    off();
+    await driver.set('k', 3);
+    expect(seen).toEqual([{ a: 1 }, undefined, 2, undefined]);
+  });
+
   it('clones values on set (no aliasing)', async () => {
     const driver = new MemoryStorageDriver();
     const value = { nested: { n: 1 } };
@@ -48,9 +63,40 @@ describe('ChromeStorageDriver', () => {
         return Promise.resolve();
       }),
     };
-    vi.stubGlobal('chrome', { storage: { local } });
-    return local;
+    const listeners = new Set<
+      (changes: Record<string, { newValue?: unknown }>, area: string) => void
+    >();
+    const onChanged = {
+      addListener: vi.fn((l: Parameters<typeof listeners.add>[0]) => listeners.add(l)),
+      removeListener: vi.fn((l: Parameters<typeof listeners.add>[0]) =>
+        listeners.delete(l),
+      ),
+      fire(changes: Record<string, { newValue?: unknown }>, area: string) {
+        for (const l of listeners) l(changes, area);
+      },
+    };
+    vi.stubGlobal('chrome', { storage: { local, onChanged } });
+    return Object.assign(local, { onChanged });
   }
+
+  it('watches chrome.storage.onChanged for the local area and key', () => {
+    const { onChanged } = stubChrome();
+    const driver = new ChromeStorageDriver();
+    const cb = vi.fn();
+    const off = driver.watch('k', cb);
+    onChanged.fire({ k: { newValue: 1 } }, 'sync');
+    onChanged.fire({ other: { newValue: 2 } }, 'local');
+    onChanged.fire({ k: { newValue: 3 } }, 'local');
+    off();
+    onChanged.fire({ k: { newValue: 4 } }, 'local');
+    expect(cb.mock.calls).toEqual([[3]]);
+    expect(onChanged.removeListener).toHaveBeenCalled();
+  });
+
+  it('watch is a no-op without chrome.storage.onChanged', () => {
+    vi.stubGlobal('chrome', { storage: { local: {} } });
+    expect(() => new ChromeStorageDriver().watch('k', vi.fn())()).not.toThrow();
+  });
 
   it('delegates to chrome.storage.local', async () => {
     const local = stubChrome();
