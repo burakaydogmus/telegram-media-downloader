@@ -63,6 +63,7 @@ export const DEFAULT_SETTINGS: Settings = {
   preferNativeDownload: true,
   largeFileThresholdMb: 200,
   skipDownloaded: true,
+  crawlAutoDownload: false,
 };
 
 export const DEFAULT_FILTERS: FilterState = {

@@ -45,6 +45,13 @@ export interface Settings {
 
   /** Skip items already recorded in the download history. */
   skipDownloaded: boolean;
+
+  /**
+   * While crawling a chat, queue newly found media that match the current
+   * filters and wait for them before scrolling on (Telegram only downloads
+   * media that is on screen).
+   */
+  crawlAutoDownload: boolean;
 }
 
 export interface FilterState {

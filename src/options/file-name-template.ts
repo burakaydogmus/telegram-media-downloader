@@ -1,5 +1,6 @@
 import { DEFAULT_SETTINGS } from '../shared/constants/index.js';
-import { sanitizeFileName } from '../shared/utils/index.js';
+import { MEDIA_TYPES, type MediaItem, type MediaType } from '../shared/types/index.js';
+import { buildRelativePath } from '../features/download/file-namer.js';
 
 export const TEMPLATE_TOKENS = [
   'chat',
@@ -50,43 +51,27 @@ export function normalizeTemplate(template: string): string {
 }
 
 /**
- * Approximate rendering for the options preview; the download pipeline owns
- * the authoritative implementation. Appends `.ext` when the result lacks it.
+ * Renders the preview with the same `buildRelativePath` the download pipeline
+ * uses, so what the options page shows is exactly what gets saved.
  */
 export function renderTemplatePreview(
   template: string,
   sample: TemplateSample = SAMPLE_ITEM,
 ): string {
-  const values = tokenValues(sample);
-  const segments = normalizeTemplate(template)
-    .split(/[\\/]/)
-    .map((segment) =>
-      segment.replace(/\{(\w+)\}/g, (match, token: string) =>
-        isToken(token) ? values[token] : match,
-      ),
-    )
-    .map((segment) => sanitizeFileName(segment, '_'));
-  const path = segments.join('/');
-  const suffix = `.${sample.ext}`;
-  return path.toLowerCase().endsWith(suffix.toLowerCase()) ? path : `${path}${suffix}`;
-}
-
-function tokenValues(sample: TemplateSample): Readonly<Record<TemplateToken, string>> {
-  const date = new Date(sample.timestamp);
-  const pad = (n: number): string => String(n).padStart(2, '0');
-  return {
-    chat: sample.chat,
-    peer: sample.peer,
-    date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
-    time: `${pad(date.getHours())}-${pad(date.getMinutes())}-${pad(date.getSeconds())}`,
-    msgId: sample.msgId,
-    index: String(sample.index),
-    type: sample.type,
-    name: sample.name,
-    ext: sample.ext,
+  const item: MediaItem = {
+    id: 'preview',
+    type: coerceType(sample.type),
+    fileName: sample.name,
+    messageId: sample.msgId,
+    albumIndex: sample.index,
+    peerId: sample.peer,
+    chatTitle: sample.chat,
+    timestamp: sample.timestamp,
   };
+  return buildRelativePath(normalizeTemplate(template), item, sample.timestamp);
 }
 
-function isToken(token: string): token is TemplateToken {
-  return (TEMPLATE_TOKENS as readonly string[]).includes(token);
+function coerceType(type: string): MediaType {
+  return (MEDIA_TYPES as readonly string[]).includes(type) ? (type as MediaType) : 'document';
 }
+

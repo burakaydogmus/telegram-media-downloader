@@ -41,6 +41,7 @@ export function readSettingsForm(doc: Document = document): Settings {
     preferNativeDownload: input(doc, 'preferNativeDownload').checked,
     largeFileThresholdMb: num('largeFileThresholdMb'),
     skipDownloaded: input(doc, 'skipDownloaded').checked,
+    crawlAutoDownload: input(doc, 'crawlAutoDownload').checked,
   };
 }
 
@@ -55,6 +56,7 @@ export function populateSettingsForm(doc: Document, settings: Settings): void {
   input(doc, 'fileNameTemplate').value = settings.fileNameTemplate;
   input(doc, 'preferNativeDownload').checked = settings.preferNativeDownload;
   input(doc, 'skipDownloaded').checked = settings.skipDownloaded;
+  input(doc, 'crawlAutoDownload').checked = settings.crawlAutoDownload;
 }
 
 function coerce<T extends string>(value: string, allowed: readonly T[], fallback: T): T {

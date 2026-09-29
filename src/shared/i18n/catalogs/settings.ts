@@ -31,6 +31,9 @@ export const settingsEn = {
     'Files above this size are never buffered in memory. 1–4096.',
   options_skip_downloaded: 'Skip already downloaded',
   options_skip_downloaded_desc: 'Do not download items recorded in the download history.',
+  options_crawl_auto_download: 'Download while scanning whole chat',
+  options_crawl_auto_download_desc:
+    'Queue matching media as the chat scan finds it and wait for it before scrolling on.',
 } as const;
 
 export const settingsTr: Readonly<Record<keyof typeof settingsEn, string>> = {
@@ -62,4 +65,7 @@ export const settingsTr: Readonly<Record<keyof typeof settingsEn, string>> = {
     'Bu boyutun üzerindeki dosyalar asla bellekte tutulmaz. 1–4096.',
   options_skip_downloaded: 'Daha önce indirilenleri atla',
   options_skip_downloaded_desc: 'İndirme geçmişinde kayıtlı öğeleri indirme.',
+  options_crawl_auto_download: 'Tüm sohbet taranırken indir',
+  options_crawl_auto_download_desc:
+    'Tarama sırasında bulunan uygun medyayı kuyruğa ekle ve kaydırmaya devam etmeden önce bekle.',
 };

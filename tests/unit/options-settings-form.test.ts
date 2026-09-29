@@ -46,6 +46,7 @@ const CUSTOM: Settings = {
   preferNativeDownload: false,
   largeFileThresholdMb: 4096,
   skipDownloaded: false,
+  crawlAutoDownload: true,
 };
 
 describe('options form', () => {
@@ -136,7 +137,7 @@ describe('file name template', () => {
       TEMPLATE_TOKENS.map((tok) => `{${tok}}`).join('_'),
     );
     expect(rendered).toMatch(
-      /^Holiday Photos_-1001234567890_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_4521_0_photo_IMG_0042\.jpg_jpg\.jpg$/,
+      /^Holiday Photos_-1001234567890_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_4521_0_photo_IMG_0042_jpg\.jpg$/,
     );
   });
 
