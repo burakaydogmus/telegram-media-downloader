@@ -1,50 +1,38 @@
-import { BaseComponent } from './base-component.js';
+import { BaseComponent, type Changes } from './base-component.js';
 import type { PanelEvent } from './panel-view-model.js';
 import { TAGS } from '../../shared/constants/index.js';
 import { createElement } from '../../shared/utils/index.js';
 import { icon } from '../icons/svg-icons.js';
-import { PANEL_STYLES } from '../styles/panel.styles.js';
+import { setText } from './dom-diff.js';
 
 export class SelectionSection extends BaseComponent {
+  private status: HTMLElement | null = null;
+  private downloadBtn: HTMLButtonElement | null = null;
+
   constructor() {
     super(TAGS.selection);
-    this.adoptStyles(PANEL_STYLES);
   }
 
   protected override get observedChannels(): readonly PanelEvent[] {
     return ['selection', 'media'];
   }
 
-  protected override render(): void {
+  protected override build(): void {
     const { t } = this.vm.i18n;
-    const selectedCount = this.vm.getSelectedIds().length;
-    const hasSelection = selectedCount > 0;
 
-    const status = createElement('div', {
-      className: hasSelection ? '' : 'muted',
-      attrs: { 'aria-live': 'polite' },
-      text: hasSelection
-        ? t('selection_count', { count: selectedCount })
-        : t('selection_none'),
-    });
+    this.status = createElement('div', { attrs: { 'aria-live': 'polite' } });
 
-    const selectAllBtn = createElement('button', {
-      className: 'btn',
-      text: t('selection_select_all'),
-      attrs: { type: 'button' },
-      onClick: () => this.vm.selectAllVisible(),
-    });
+    const button = (text: string, onClick: () => void): HTMLButtonElement =>
+      createElement('button', {
+        className: 'btn',
+        text,
+        attrs: { type: 'button' },
+        onClick,
+      });
 
-    const clearBtn = createElement('button', {
-      className: 'btn',
-      text: t('selection_clear'),
-      attrs: { type: 'button' },
-      onClick: () => this.vm.clearSelection(),
-    });
-
-    const downloadBtn = createElement('button', {
+    this.downloadBtn = createElement('button', {
       className: 'btn btn--primary',
-      attrs: { type: 'button', ...(hasSelection ? {} : { disabled: 'true' }) },
+      attrs: { type: 'button' },
       children: [
         icon('download', 16),
         document.createTextNode(' ' + t('selection_download')),
@@ -52,38 +40,49 @@ export class SelectionSection extends BaseComponent {
       onClick: () => this.vm.downloadSelected(),
     });
 
-    const csvBtn = createElement('button', {
-      className: 'btn',
-      text: t('report_export_csv'),
-      attrs: { type: 'button' },
-      onClick: () => this.vm.exportReport('csv'),
-    });
+    this.mount(
+      createElement('section', {
+        className: 'section',
+        attrs: { 'aria-label': t('section_selection') },
+        children: [
+          createElement('h2', {
+            className: 'section__title',
+            text: t('section_selection'),
+          }),
+          this.status,
+          createElement('div', {
+            className: 'row gap-top',
+            children: [
+              button(t('selection_select_all'), () => this.vm.selectAllVisible()),
+              button(t('selection_clear'), () => this.vm.clearSelection()),
+            ],
+          }),
+          createElement('div', {
+            className: 'row gap-top',
+            children: [this.downloadBtn],
+          }),
+          createElement('div', {
+            className: 'row gap-top',
+            children: [
+              button(t('report_export_csv'), () => this.vm.exportReport('csv')),
+              button(t('report_export_json'), () => this.vm.exportReport('json')),
+            ],
+          }),
+        ],
+      }),
+    );
+  }
 
-    const jsonBtn = createElement('button', {
-      className: 'btn',
-      text: t('report_export_json'),
-      attrs: { type: 'button' },
-      onClick: () => this.vm.exportReport('json'),
-    });
-
-    const section = createElement('section', {
-      className: 'section',
-      attrs: { 'aria-label': t('section_selection') },
-      children: [
-        createElement('h2', {
-          className: 'section__title',
-          text: t('section_selection'),
-        }),
-        status,
-        createElement('div', { attrs: { style: 'height:8px' } }),
-        createElement('div', { className: 'row', children: [selectAllBtn, clearBtn] }),
-        createElement('div', { attrs: { style: 'height:6px' } }),
-        createElement('div', { className: 'row', children: [downloadBtn] }),
-        createElement('div', { attrs: { style: 'height:6px' } }),
-        createElement('div', { className: 'row', children: [csvBtn, jsonBtn] }),
-      ],
-    });
-
-    this.mount(section);
+  protected override update(_changes: Changes): void {
+    const { t } = this.vm.i18n;
+    const count = this.vm.getSelectedIds().length;
+    if (this.status) {
+      setText(
+        this.status,
+        count > 0 ? t('selection_count', { count }) : t('selection_none'),
+      );
+      this.status.classList.toggle('muted', count === 0);
+    }
+    if (this.downloadBtn) this.downloadBtn.disabled = count === 0;
   }
 }

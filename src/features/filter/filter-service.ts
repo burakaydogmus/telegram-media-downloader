@@ -5,6 +5,14 @@ import type {
   DateRange,
 } from '../../shared/types/index.js';
 
+/** Runtime facts the filter needs but that are not part of `FilterState`. */
+export interface FilterContext {
+  /** Peer of the chat currently open; when undefined, scope is not applied. */
+  readonly currentPeerId?: string;
+  /** Download-history lookup used by `hideDownloaded`. */
+  readonly isDownloaded?: (id: string) => boolean;
+}
+
 function rangeStart(range: DateRange, now: number): number {
   const date = new Date(now);
   switch (range) {
@@ -33,22 +41,35 @@ function rangeStart(range: DateRange, now: number): number {
 export class FilterService {
   constructor(private readonly now: () => number = Date.now) {}
 
-  apply(items: readonly MediaItem[], filters: FilterState): MediaItem[] {
+  /**
+   * While a date range other than `all` is active, items without a `timestamp`
+   * are excluded — their age is unknown.
+   */
+  apply(
+    items: readonly MediaItem[],
+    filters: FilterState,
+    ctx: FilterContext = {},
+  ): MediaItem[] {
     const typeSet = new Set<MediaType>(filters.types);
-    const start = rangeStart(filters.dateRange, this.now());
     const allTypes = typeSet.size === 0;
+    const byDate = filters.dateRange !== 'all';
+    const start = rangeStart(filters.dateRange, this.now());
+    const peerId = filters.scope === 'currentChat' ? ctx.currentPeerId : undefined;
+    const isDownloaded = filters.hideDownloaded ? ctx.isDownloaded : undefined;
 
     return items.filter((item) => {
       if (!allTypes && !typeSet.has(item.type)) return false;
-      if (filters.dateRange !== 'all') {
+      if (byDate) {
         if (typeof item.timestamp !== 'number') return false;
         if (item.timestamp < start) return false;
       }
+      if (peerId !== undefined && item.peerId !== peerId) return false;
+      if (isDownloaded?.(item.id) === true) return false;
       return true;
     });
   }
 
-  matches(item: MediaItem, filters: FilterState): boolean {
-    return this.apply([item], filters).length === 1;
+  matches(item: MediaItem, filters: FilterState, ctx: FilterContext = {}): boolean {
+    return this.apply([item], filters, ctx).length === 1;
   }
 }

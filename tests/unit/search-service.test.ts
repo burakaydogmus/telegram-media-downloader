@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { SearchService } from '../../src/features/search/search-service.js';
 import { makeItem } from '../helpers/factories.js';
 
@@ -53,6 +53,26 @@ describe('SearchService', () => {
     const hits = service.search(items, 'report');
     expect(hits[0]?.item.id).toBe('3');
     expect(hits[0]?.score).toBeGreaterThanOrEqual(hits[hits.length - 1]?.score ?? 0);
+  });
+
+  it('matches by chat title', () => {
+    const withChat = [
+      ...items,
+      makeItem({ id: '4', type: 'photo', fileName: 'x.jpg', chatTitle: 'Family Group' }),
+    ];
+    expect(service.filter(withChat, 'family').map((i) => i.id)).toEqual(['4']);
+  });
+
+  it('returns a copy in original order for an empty query without scoring', () => {
+    const many = Array.from({ length: 10_000 }, (_, i) => makeItem({ id: `i${i}` }));
+    const spy = vi.spyOn(service, 'search');
+    const result = service.filter(many, '   ');
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+    expect(result).not.toBe(many);
+    expect(result).toHaveLength(10_000);
+    expect(result[0]).toBe(many[0]);
+    expect(result[9_999]).toBe(many[9_999]);
   });
 
   it('respects the threshold', () => {
