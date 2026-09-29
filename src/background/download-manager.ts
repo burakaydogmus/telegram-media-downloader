@@ -1,6 +1,6 @@
 import type { ILogger } from '../shared/logger/index.js';
-import { sanitizeFileName } from '../shared/utils/index.js';
 import { DownloadError, toMessage } from '../shared/errors/index.js';
+import { sanitizeRelativePath } from './download-path.js';
 
 export class DownloadManager {
   private readonly pending = new Map<
@@ -17,7 +17,7 @@ export class DownloadManager {
     }
     this.ensureListener();
 
-    const safeName = sanitizeFileName(fileName);
+    const safeName = sanitizeRelativePath(fileName);
     let downloadId: number;
     try {
       downloadId = await chrome.downloads.download({
