@@ -21,7 +21,7 @@ export const settingsEn = {
   options_token_msgId: 'message ID',
   options_token_index: 'position in an album',
   options_token_type: 'media type',
-  options_token_name: 'original file name',
+  options_token_name: 'original file name (without extension)',
   options_token_ext: 'file extension',
   options_prefer_native: 'Prefer Telegram’s own download',
   options_prefer_native_desc:
@@ -55,7 +55,7 @@ export const settingsTr: Readonly<Record<keyof typeof settingsEn, string>> = {
   options_token_msgId: 'mesaj kimliği',
   options_token_index: 'albümdeki sıra',
   options_token_type: 'medya türü',
-  options_token_name: 'özgün dosya adı',
+  options_token_name: 'özgün dosya adı (uzantısız)',
   options_token_ext: 'dosya uzantısı',
   options_prefer_native: 'Telegram’ın kendi indirmesini tercih et',
   options_prefer_native_desc:

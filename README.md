@@ -24,12 +24,19 @@ themeable floating panel.
   incremental, duplicate-free scanning.
 - **Centralized registry** — O(1) add/lookup/remove/update with secondary
   type indexes.
-- **Selection system** — single, multi, select-all-visible, and clear, with
-  `Ctrl/Cmd+A` and `Esc` keyboard shortcuts.
-- **Download queue** — concurrency control, retry with backoff, per-task
-  progress, and cancellation (`queued → running → completed | failed | cancelled`).
+- **Media grid** — virtualized thumbnails with click, Shift+click range and
+  keyboard selection, plus `Ctrl/Cmd+A` and `Esc` shortcuts.
+- **Scan whole chat** — walks the chat history upward (pause/resume, "until
+  date", resumable checkpoints), optionally downloading as it goes.
+- **Download queue** — concurrency control, exponential backoff, pause/resume,
+  auto-pause on Telegram flood limits, live byte progress, and cancellation.
+- **Full-quality downloads** — Telegram's own download for photos/videos,
+  tracked to real completion by the service worker, saved with a configurable
+  **file-name template** (sub-folders per chat/date), optional **save folder**
+  streaming for large files, and a **download history** to skip duplicates.
 - **Search** — fuzzy + partial matching over file name, type, and date.
-- **Filtering** — by media type and by `Today` / `This Week` / `This Month`.
+- **Filtering** — by media type, `Today` / `This Week` / `This Month`, current
+  chat vs all chats, and hide already-downloaded.
 - **Reporting** — export the current view as **CSV** or **JSON** (with CSV
   injection hardening).
 - **Floating panel** — draggable, collapsible, position-persistent, with
@@ -107,8 +114,10 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design.
    to the scanner, so updates stay fast on huge channels.
 4. The **AppController** wires the registry to **search/filter/selection** and a
    **download queue**, exposing one reactive `PanelViewModel` to the UI.
-5. Downloads are executed by the **background service worker** through
-   `chrome.downloads` (content scripts can't call it directly).
+5. Downloads are triggered in the page (Telegram's own download menu, or a
+   direct fetch for documents/audio). The **service worker** matches each one
+   via `chrome.downloads.onDeterminingFilename`, renames it with your template,
+   and reports real progress and completion back to the queue.
 
 ---
 
@@ -125,11 +134,15 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full design.
 
 ## Privacy & permissions
 
-| Permission                           | Why it's needed                                     |
-| ------------------------------------ | --------------------------------------------------- |
-| `storage`                            | Persist settings, filters, panel state, statistics. |
-| `downloads`                          | Save selected media to disk.                        |
-| `scripting`                          | Reserved for resilient injection on SPA navigation. |
+| Permission  | Why it's needed                                     |
+| ----------- | --------------------------------------------------- |
+| `storage`   | Persist settings, filters, panel state, statistics. |
+| `downloads` | Save selected media to disk.                        |
+| `scripting` | Reserved for resilient injection on SPA navigation. |
+
+Download renaming uses `chrome.downloads.onDeterminingFilename`, which only
+touches downloads started from `web.telegram.org` while the extension expects
+one; all other downloads are left untouched.
 | `host_permissions: web.telegram.org` | Run only on Telegram Web; no other site is touched. |
 
 The extension makes **no external network requests** of its own and stores

@@ -4,8 +4,15 @@
     <div class="chat-list custom-scroll">
       <div class="ListItem Chat chat-item-clickable selected">
         <div class="ListItem-button">
-          <div class="Avatar size-large" data-peer-id="-1009876543210"><img class="Avatar__media avatar-media" src="https://cdn.example.org/avatar-club.jpg" /></div>
-          <div class="info"><div class="title"><h3 class="fullName">Photo Club</h3></div></div>
+          <div class="Avatar size-large" data-peer-id="-1009876543210">
+            <img
+              class="Avatar__media avatar-media"
+              src="https://cdn.example.org/avatar-club.jpg"
+            />
+          </div>
+          <div class="info">
+            <div class="title"><h3 class="fullName">Photo Club</h3></div>
+          </div>
         </div>
       </div>
     </div>
@@ -32,101 +39,192 @@
 
                 <div class="sender-group-container">
                   <!-- Single photo: blurred thumb + full blob. -->
-                  <div id="message-5001" class="Message message-list-item first-in-group allow-selection" data-message-id="5001">
-                    <div class="Avatar size-small" data-peer-id="555"><img class="Avatar__media" src="https://cdn.example.org/avatar-bob.jpg" /></div>
+                  <div
+                    id="message-5001"
+                    class="Message message-list-item first-in-group allow-selection"
+                    data-message-id="5001"
+                  >
+                    <div class="Avatar size-small" data-peer-id="555">
+                      <img
+                        class="Avatar__media"
+                        src="https://cdn.example.org/avatar-bob.jpg"
+                      />
+                    </div>
                     <div class="message-content-wrapper">
                       <div class="message-content media photo has-shadow">
                         <div class="content-inner">
-                          <div class="message-title"><span class="sender-title">Bob</span></div>
+                          <div class="message-title">
+                            <span class="sender-title">Bob</span>
+                          </div>
                           <div id="message-media-5001" class="media-inner interactive">
-                            <img class="thumbnail blurred-thumb" src="data:image/jpeg;base64,/9j/THUMB" />
-                            <img class="full-media" src="blob:https://web.telegram.org/a/photo-5001" />
+                            <img
+                              class="thumbnail blurred-thumb"
+                              src="data:image/jpeg;base64,/9j/THUMB"
+                            />
+                            <img
+                              class="full-media"
+                              src="blob:https://web.telegram.org/a/photo-5001"
+                            />
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time" title="Thursday, June 5, 2025 at 10:00:00 AM">10:00</span></div>
+                        <div class="MessageMeta">
+                          <span
+                            class="message-time"
+                            title="Thursday, June 5, 2025 at 10:00:00 AM"
+                            >10:00</span
+                          >
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Video with thumbnail + duration. -->
-                  <div id="message-5002" class="Message message-list-item" data-message-id="5002">
+                  <div
+                    id="message-5002"
+                    class="Message message-list-item"
+                    data-message-id="5002"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content media video has-shadow">
                         <div class="content-inner">
                           <div id="message-media-5002" class="media-inner interactive">
-                            <img class="thumbnail" src="data:image/jpeg;base64,/9j/VIDTHUMB" />
-                            <video class="full-media" muted playsinline autoplay src="blob:https://web.telegram.org/a/video-5002"></video>
+                            <img
+                              class="thumbnail"
+                              src="data:image/jpeg;base64,/9j/VIDTHUMB"
+                            />
+                            <video
+                              class="full-media"
+                              muted
+                              playsinline
+                              autoplay
+                              src="blob:https://web.telegram.org/a/video-5002"
+                            ></video>
                             <div class="message-media-duration">1:05</div>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:01</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:01</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Round video. -->
-                  <div id="message-5003" class="Message message-list-item" data-message-id="5003">
+                  <div
+                    id="message-5003"
+                    class="Message message-list-item"
+                    data-message-id="5003"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content round">
                         <div class="RoundVideo">
-                          <div class="thumbnail-wrapper"><img class="thumbnail" src="data:image/jpeg;base64,/9j/RND" /></div>
-                          <video class="full-media" muted loop playsinline src="blob:https://web.telegram.org/a/round-5003"></video>
+                          <div class="thumbnail-wrapper">
+                            <img class="thumbnail" src="data:image/jpeg;base64,/9j/RND" />
+                          </div>
+                          <video
+                            class="full-media"
+                            muted
+                            loop
+                            playsinline
+                            src="blob:https://web.telegram.org/a/round-5003"
+                          ></video>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:02</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:02</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- GIF. -->
-                  <div id="message-5004" class="Message message-list-item" data-message-id="5004">
+                  <div
+                    id="message-5004"
+                    class="Message message-list-item"
+                    data-message-id="5004"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content media gif">
                         <div class="content-inner">
                           <div id="message-media-5004" class="media-inner">
-                            <video class="full-media" muted loop autoplay playsinline src="blob:https://web.telegram.org/a/gif-5004"></video>
+                            <video
+                              class="full-media"
+                              muted
+                              loop
+                              autoplay
+                              playsinline
+                              src="blob:https://web.telegram.org/a/gif-5004"
+                            ></video>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:03</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:03</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Document. -->
-                  <div id="message-5005" class="Message message-list-item" data-message-id="5005">
+                  <div
+                    id="message-5005"
+                    class="Message message-list-item"
+                    data-message-id="5005"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content document">
                         <div class="content-inner">
                           <div class="File interactive">
-                            <div class="file-icon-container"><div class="file-icon default"><span class="file-ext">zip</span></div></div>
+                            <div class="file-icon-container">
+                              <div class="file-icon default">
+                                <span class="file-ext">zip</span>
+                              </div>
+                            </div>
                             <div class="file-info">
-                              <div class="file-title" dir="auto" title="assets-v2.zip">assets-v2.zip</div>
-                              <div class="file-subtitle" dir="auto"><span>12.5 MB</span></div>
+                              <div class="file-title" dir="auto" title="assets-v2.zip">
+                                assets-v2.zip
+                              </div>
+                              <div class="file-subtitle" dir="auto">
+                                <span>12.5 MB</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:04</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:04</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Voice. -->
-                  <div id="message-5006" class="Message message-list-item" data-message-id="5006">
+                  <div
+                    id="message-5006"
+                    class="Message message-list-item"
+                    data-message-id="5006"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content voice">
                         <div class="content-inner">
                           <div class="Audio voice">
                             <button class="Button toggle-play"></button>
-                            <div class="waveform-wrapper"><canvas class="waveform"></canvas></div>
+                            <div class="waveform-wrapper">
+                              <canvas class="waveform"></canvas>
+                            </div>
                             <p class="voice-duration">0:09</p>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:05</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:05</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Music. -->
-                  <div id="message-5007" class="Message message-list-item" data-message-id="5007">
+                  <div
+                    id="message-5007"
+                    class="Message message-list-item"
+                    data-message-id="5007"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content audio">
                         <div class="content-inner">
@@ -134,88 +232,179 @@
                             <button class="Button toggle-play"></button>
                             <div class="content">
                               <p class="title" dir="auto">Evening Theme.mp3</p>
-                              <div class="meta"><span class="performer">Artist</span></div>
+                              <div class="meta">
+                                <span class="performer">Artist</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:06</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:06</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Album of 3 grouped messages. -->
-                  <div id="message-5010" class="Message message-list-item" data-message-id="5010">
+                  <div
+                    id="message-5010"
+                    class="Message message-list-item"
+                    data-message-id="5010"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content media has-shadow">
                         <div class="content-inner">
                           <div class="Album">
                             <div class="album-item-select-wrapper">
-                              <div id="album-media-message-5008" class="media-inner interactive"><img class="full-media" src="blob:https://web.telegram.org/a/album-5008" /></div>
+                              <div
+                                id="album-media-message-5008"
+                                class="media-inner interactive"
+                              >
+                                <img
+                                  class="full-media"
+                                  src="blob:https://web.telegram.org/a/album-5008"
+                                />
+                              </div>
                             </div>
                             <div class="album-item-select-wrapper">
-                              <div id="album-media-message-5009" class="media-inner interactive">
-                                <img class="thumbnail" src="data:image/jpeg;base64,/9j/AV" />
-                                <video class="full-media" muted src="blob:https://web.telegram.org/a/album-5009"></video>
+                              <div
+                                id="album-media-message-5009"
+                                class="media-inner interactive"
+                              >
+                                <img
+                                  class="thumbnail"
+                                  src="data:image/jpeg;base64,/9j/AV"
+                                />
+                                <video
+                                  class="full-media"
+                                  muted
+                                  src="blob:https://web.telegram.org/a/album-5009"
+                                ></video>
                                 <div class="message-media-duration">0:20</div>
                               </div>
                             </div>
                             <div class="album-item-select-wrapper">
-                              <div id="album-media-message-5010" class="media-inner interactive"><img class="full-media" src="blob:https://web.telegram.org/a/album-5010" /></div>
+                              <div
+                                id="album-media-message-5010"
+                                class="media-inner interactive"
+                              >
+                                <img
+                                  class="full-media"
+                                  src="blob:https://web.telegram.org/a/album-5010"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:07</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:07</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Sticker. -->
-                  <div id="message-5011" class="Message message-list-item" data-message-id="5011">
+                  <div
+                    id="message-5011"
+                    class="Message message-list-item"
+                    data-message-id="5011"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content sticker">
-                        <div class="sticker-media"><img class="full-media" src="blob:https://web.telegram.org/a/sticker-5011" /></div>
-                        <div class="MessageMeta"><span class="message-time">10:08</span></div>
+                        <div class="sticker-media">
+                          <img
+                            class="full-media"
+                            src="blob:https://web.telegram.org/a/sticker-5011"
+                          />
+                        </div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:08</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Link preview with a custom emoji and a reply. -->
-                  <div id="message-5012" class="Message message-list-item" data-message-id="5012">
+                  <div
+                    id="message-5012"
+                    class="Message message-list-item"
+                    data-message-id="5012"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content text has-replies">
                         <div class="content-inner">
-                          <div class="EmbeddedMessage"><img class="pictogram" src="blob:https://web.telegram.org/a/reply-thumb" /><div class="message-title">Bob</div></div>
-                          <div class="text-content">Read this <a href="https://example.org/post">example.org/post</a><img class="custom-emoji emoji" src="blob:https://web.telegram.org/a/emoji" /></div>
+                          <div class="EmbeddedMessage">
+                            <img
+                              class="pictogram"
+                              src="blob:https://web.telegram.org/a/reply-thumb"
+                            />
+                            <div class="message-title">Bob</div>
+                          </div>
+                          <div class="text-content">
+                            Read this
+                            <a href="https://example.org/post">example.org/post</a
+                            ><img
+                              class="custom-emoji emoji"
+                              src="blob:https://web.telegram.org/a/emoji"
+                            />
+                          </div>
                           <div class="WebPage">
                             <div class="WebPage--content">
-                              <div class="media-inner"><img class="full-media" src="https://example.org/og-a.jpg" /></div>
+                              <div class="media-inner">
+                                <img
+                                  class="full-media"
+                                  src="https://example.org/og-a.jpg"
+                                />
+                              </div>
                               <p class="site-name">Example</p>
                             </div>
                           </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">10:09</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">10:09</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Service message (chat photo changed). -->
-                <div id="message-5013" class="ActionMessage message-list-item" data-message-id="5013">
+                <div
+                  id="message-5013"
+                  class="ActionMessage message-list-item"
+                  data-message-id="5013"
+                >
                   <span class="action-message-content">Bob changed the group photo</span>
-                  <div class="media-inner"><img class="full-media" src="blob:https://web.telegram.org/a/action-photo" /></div>
+                  <div class="media-inner">
+                    <img
+                      class="full-media"
+                      src="blob:https://web.telegram.org/a/action-photo"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div class="message-date-group">
                 <div class="sticky-date interactive"><span>June 6, 2025</span></div>
                 <div class="sender-group-container">
-                  <div id="message-5020" class="Message message-list-item own" data-message-id="5020">
+                  <div
+                    id="message-5020"
+                    class="Message message-list-item own"
+                    data-message-id="5020"
+                  >
                     <div class="message-content-wrapper">
                       <div class="message-content media photo">
                         <div class="content-inner">
-                          <div id="message-media-5020" class="media-inner"><img class="full-media" src="blob:https://web.telegram.org/a/photo-5020" /></div>
+                          <div id="message-media-5020" class="media-inner">
+                            <img
+                              class="full-media"
+                              src="blob:https://web.telegram.org/a/photo-5020"
+                            />
+                          </div>
                         </div>
-                        <div class="MessageMeta"><span class="message-time">8:30 PM</span></div>
+                        <div class="MessageMeta">
+                          <span class="message-time">8:30 PM</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -229,10 +418,18 @@
   </div>
 
   <div id="RightColumn">
-    <div class="Profile"><div class="shared-media"><div class="Media scroll-item"><img class="media-miniature" src="blob:https://web.telegram.org/a/shared" /></div></div></div>
+    <div class="Profile">
+      <div class="shared-media">
+        <div class="Media scroll-item">
+          <img class="media-miniature" src="blob:https://web.telegram.org/a/shared" />
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div id="MediaViewer" class="MediaViewer">
-  <div class="MediaViewerContent"><img class="full-media" src="blob:https://web.telegram.org/a/viewer" /></div>
+  <div class="MediaViewerContent">
+    <img class="full-media" src="blob:https://web.telegram.org/a/viewer" />
+  </div>
 </div>

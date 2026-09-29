@@ -1,10 +1,6 @@
 import type { DownloadTask, MediaItem } from '../../shared/types/index.js';
 import { abortError } from '../../shared/utils/index.js';
-import {
-  HttpDownloadError,
-  NonRetryableDownloadError,
-  isNonRetryable,
-} from './download-errors.js';
+import { HttpDownloadError, NonRetryableDownloadError } from './download-errors.js';
 
 export {
   NonRetryableDownloadError,
@@ -122,62 +118,5 @@ export function saveBlob(doc: Document, blob: Blob, fileName: string): void {
   } finally {
     // Give the browser time to start the download before releasing the URL.
     setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
-  }
-}
-
-/**
- * @deprecated Use `createDownloadExecutor`. Kept so the current composition
- * root keeps compiling; buffers in memory and saves with the raw file name.
- */
-export class BlobDownloadExecutor implements DownloadExecutor {
-  constructor(private readonly doc: Document = document) {}
-
-  async execute(
-    task: DownloadTask,
-    onProgress: ProgressReporter,
-    signal: AbortSignal,
-  ): Promise<void> {
-    if (signal.aborted) throw abortError();
-    const url = task.item.url;
-    if (url === undefined || url.length === 0) {
-      throw new NonRetryableDownloadError('Media item has no downloadable URL');
-    }
-    onProgress(0.02);
-    const response = await fetchMedia(url, signal);
-    const blob = await readBody(response, signal, onProgress);
-    saveBlob(this.doc, blob, task.item.fileName ?? `${task.item.type}_${task.item.id}`);
-    onProgress(1);
-  }
-}
-
-/** @deprecated Use `createDownloadExecutor`. */
-export class CompositeDownloadExecutor implements DownloadExecutor {
-  constructor(
-    private readonly primary: DownloadExecutor,
-    private readonly native: NativeDownloader,
-  ) {}
-
-  async execute(
-    task: DownloadTask,
-    onProgress: ProgressReporter,
-    signal: AbortSignal,
-  ): Promise<void> {
-    if (signal.aborted) throw abortError();
-    const { item } = task;
-    const streamed = item.type === 'video' || item.type === 'gif';
-    const hasUrl = typeof item.url === 'string' && item.url.length > 0;
-
-    if (hasUrl && !streamed) {
-      try {
-        await this.primary.execute(task, onProgress, signal);
-        return;
-      } catch (error) {
-        if (signal.aborted || !isNonRetryable(error)) throw error;
-      }
-    }
-
-    onProgress(0.1);
-    await this.native.download(item, signal);
-    onProgress(1);
   }
 }

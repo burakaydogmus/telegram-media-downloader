@@ -5,10 +5,13 @@ import type {
   RuntimeMessage,
   MessageResponse,
   ContentState,
+  SelectorHealthReport,
 } from '../shared/types/index.js';
 import { PanelComponent } from '../ui/components/panel.component.js';
 import { ThemeManager } from '../ui/styles/theme-manager.js';
 import { buildContentApp } from './composition-root.js';
+import { watchSelectorHealth } from './selector-health.js';
+import { registerKeyboardShortcuts } from './keyboard-shortcuts.js';
 import type { AppController } from './app-controller.js';
 
 async function main(): Promise<void> {
@@ -40,11 +43,32 @@ async function main(): Promise<void> {
   const panel = new PanelComponent();
   panel.viewModel = controller;
   await restorePanelState(panel, container);
-  mountPanel(panel, settings.theme, container);
+  const themeManager = mountPanel(panel, settings.theme, container);
+
+  // Options-page edits reach the running tab (controller handles the rest).
+  container
+    .resolve('storage')
+    .onSettingsChanged((next) => themeManager.apply(next.theme));
+
+  const health: { latest?: SelectorHealthReport } = {};
+  watchSelectorHealth(document, detection.client, (report) => {
+    health.latest = report;
+    controller.setHealth(report);
+  });
+
+  window.addEventListener('hashchange', () => controller.notifyLocationChanged());
+  window.addEventListener('pagehide', () => {
+    void container.resolve('history').flush();
+  });
 
   controller.start(observeRoot ?? document.body);
-  registerKeyboardShortcuts(controller, panel);
-  registerMessageListener(controller, panel, detection.client);
+  registerKeyboardShortcuts({
+    isPanelVisible: () => panel.isVisible,
+    selectAllVisible: () => controller.selectAllVisible(),
+    hasSelection: () => controller.getSelectedIds().length > 0,
+    clearSelection: () => controller.clearSelection(),
+  });
+  registerMessageListener(controller, panel, detection.client, health);
 
   logger.info('Telegram Media Downloader ready.');
 }
@@ -53,7 +77,7 @@ function mountPanel(
   panel: PanelComponent,
   theme: Parameters<ThemeManager['apply']>[0],
   container: Awaited<ReturnType<typeof buildContentApp>>['container'],
-): void {
+): ThemeManager {
   panel.host.id = PANEL_ROOT_ID;
 
   const themeManager = new ThemeManager(panel.host);
@@ -62,6 +86,7 @@ function mountPanel(
   document.body.appendChild(panel.host);
   panel.connect();
   container.resolve('logger').child('ui').debug('Panel mounted');
+  return themeManager;
 }
 
 async function restorePanelState(
@@ -73,41 +98,11 @@ async function restorePanelState(
   panel.configure(state, (next) => void storage.savePanelState(next));
 }
 
-function registerKeyboardShortcuts(
-  controller: AppController,
-  panel: PanelComponent,
-): void {
-  window.addEventListener(
-    'keydown',
-    (event) => {
-      if (!panel.isVisible) return;
-      const target = event.target as HTMLElement | null;
-      const typing =
-        target?.tagName === 'INPUT' ||
-        target?.tagName === 'TEXTAREA' ||
-        target?.isContentEditable === true;
-
-      if (
-        (event.ctrlKey || event.metaKey) &&
-        event.key.toLowerCase() === 'a' &&
-        !typing
-      ) {
-        event.preventDefault();
-        controller.selectAllVisible();
-      } else if (event.key === 'Escape') {
-        if (controller.getSelectedIds().length > 0) {
-          controller.clearSelection();
-        }
-      }
-    },
-    true,
-  );
-}
-
 function registerMessageListener(
   controller: AppController,
   panel: PanelComponent,
   client: string,
+  health: { readonly latest?: SelectorHealthReport },
 ): void {
   chrome.runtime.onMessage.addListener(
     (message: RuntimeMessage, _sender, sendResponse: (r: MessageResponse) => void) => {
@@ -129,12 +124,13 @@ function registerMessageListener(
             client,
             totalMedia: controller.getStatistics().total,
             selected: controller.getSelectedIds().length,
+            ...(health.latest ? { health: health.latest } : {}),
           };
           sendResponse({ ok: true, data: state });
           return false;
         }
         default:
-          sendResponse({ ok: false, error: 'Unknown message' });
+          // Other listeners (e.g. the download tracker) handle the rest.
           return false;
       }
     },

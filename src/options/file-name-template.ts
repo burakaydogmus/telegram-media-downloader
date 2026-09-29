@@ -72,6 +72,7 @@ export function renderTemplatePreview(
 }
 
 function coerceType(type: string): MediaType {
-  return (MEDIA_TYPES as readonly string[]).includes(type) ? (type as MediaType) : 'document';
+  return (MEDIA_TYPES as readonly string[]).includes(type)
+    ? (type as MediaType)
+    : 'document';
 }
-

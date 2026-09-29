@@ -78,29 +78,54 @@ TelegramDetector → MediaScanner → MediaRegistry → AppController → PanelV
    readiness using centralized, client-specific selectors
    (`src/shared/constants/selectors.ts`). All brittle DOM knowledge lives here so
    Telegram markup changes are a one-file fix.
-2. **`MediaScanner`** extracts `MediaItem` metadata from message nodes. It marks
-   already-seen nodes to guarantee **incremental, duplicate-free** scanning.
+2. **`MediaScanner`** classifies media **per message** (album items get their
+   own `albumIndex`), ignores stickers/viewers/the extension's own panel, and
+   tracks seen elements in a `WeakSet` — it never writes to Telegram's DOM.
+   Item ids come from `mediaKey(peer, message, albumIndex, type)`, never from
+   URLs, so a blurred `data:` thumb upgrading to a `blob:` image is an
+   **update**, not a duplicate. `scan()` returns `{ items, updates }`.
 3. **`MediaRegistry`** stores items in a `Map` for **O(1)** add/get/remove/update
    and maintains per-type index sets for fast filtering. It emits
    `added/removed/updated/cleared` events via a `TypedEmitter`.
-4. **`MutationEngine`** wraps a `MutationObserver` with **debouncing + batching**
-   and de-duplication of added subtrees, so only changed regions are re-scanned —
-   never a full rescan. This is what keeps incremental updates well under 100ms on
-   10,000+ message chats.
-5. **`AppController`** subscribes to the registry, applies the active
-   search/filter to compute the visible set, manages selection and the download
-   queue, and exposes a single reactive `PanelViewModel` to the UI.
+4. **`MutationEngine`** observes `childList` **and** `src/poster/style/href`
+   attributes (lazy loading), debounces, de-duplicates roots in document order,
+   and processes large bursts in idle-time chunks — nothing is dropped.
+5. **`AppController`** subscribes to the registry, applies search/filters
+   (scope = current chat via `peer.ts`, hide-downloaded via the history), manages
+   selection, the download queue, the whole-chat crawler and live settings, and
+   exposes a single reactive `PanelViewModel` to the UI. Channels: `queue` for
+   state transitions, throttled `progress` for byte progress.
+
+### Download pipeline
+
+```
+DownloadQueue ─▶ StrategyDownloadExecutor ─┬─ native: NativeDownloadTrigger (Telegram menu, serial + RateLimiter)
+ (backoff,        (route per item/settings) ├─ direct: fetch same-origin blob / web.telegram.org
+  pause/flood,                              │          ├─ large + folder ─▶ DirectoryWriter (stream to disk)
+  dedupe)                                   │          └─ small ─▶ <a download="tgmd-<token>__…">
+                                            └─ DownloadTracker ─ EXPECT_DOWNLOAD ─▶ service worker
+                                                                ◀─ DOWNLOAD_UPDATE ─┘ (onDeterminingFilename
+                                                                    renames to the template path; onChanged
+                                                                    + polling report real progress/completion)
+```
+
+Completed downloads are recorded in an IndexedDB **download history**
+(`DownloadHistory`), used for "skip already downloaded" and "hide downloaded".
+The **ChatCrawler** scrolls a chat upward step by step (checkpointed in
+IndexedDB); with `crawlAutoDownload` each step waits for the queue so native
+downloads run while their messages are on screen. **`selector-health.ts`**
+self-tests the selectors and surfaces failures in the panel and popup.
 
 ## 5. Features
 
-| Feature         | Key type(s)                         | Notes                                                                                                      |
-| --------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `download`      | `DownloadQueue`, `DownloadExecutor` | Concurrency, retry with backoff, progress, cancellation. The executor sends `DOWNLOAD_FILE` to the worker. |
-| `selection`     | `SelectionService`                  | Set-backed selection with toggle / select-only / select-all / clear / prune. Emits `change`.               |
-| `search`        | `SearchService`                     | Fuzzy + partial matching (`utils/fuzzy.ts`), ranked `SearchHit[]`.                                         |
-| `filter`        | `FilterService`                     | Type predicates + date ranges (Today / Week / Month).                                                      |
-| `reporting`     | `ReportService`                     | CSV (RFC-4180 escaping + formula-injection hardening) and JSON.                                            |
-| `local-storage` | `StorageService`, `StorageDriver`   | `ChromeStorageDriver` in prod, `MemoryStorageDriver` in tests.                                             |
+| Feature         | Key type(s)                                                                                                         | Notes                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `download`      | `DownloadQueue`, `createDownloadExecutor`, `DownloadTracker`, `DirectoryWriter`, `RateLimiter`, `buildRelativePath` | Concurrency, exponential backoff, pause/flood auto-pause, dedupe, native vs direct routing, file-name templates, SW-tracked completion. |
+| `selection`     | `SelectionService`                                                                                                  | Set-backed selection with toggle / select-only / select-all / clear / prune. Emits `change`.                                            |
+| `search`        | `SearchService`                                                                                                     | Fuzzy + partial matching (`utils/fuzzy.ts`), ranked `SearchHit[]`.                                                                      |
+| `filter`        | `FilterService`                                                                                                     | Type, date range, scope (current chat), hide downloaded.                                                                                |
+| `reporting`     | `ReportService`                                                                                                     | CSV (RFC-4180 escaping + formula-injection hardening) and JSON.                                                                         |
+| `local-storage` | `StorageService`, `DownloadHistory`, `IdbCrawlCheckpointStore`, `createPersistence`                                 | Serialized read-modify-write, live `onSettingsChanged`, IndexedDB with memory fallback.                                                 |
 
 ## 6. UI: Web Components without the global registry
 

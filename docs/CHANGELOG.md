@@ -6,7 +6,46 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+
+- **Media grid** in the panel: virtualized thumbnails, click / Shift+click range
+  selection, keyboard navigation, "downloaded" badges, reveal-in-chat.
+- **Scan whole chat**: controlled upward auto-scroll with pause/resume/stop,
+  "until date", IndexedDB checkpoints, and optional download-while-scanning.
+- **Real download tracking**: the service worker matches Telegram-originated
+  downloads, renames them with a **file-name template** (sub-folders, tokens
+  `{chat} {peer} {date} {time} {msgId} {index} {type} {name} {ext}`) and reports
+  real progress/completion/failure.
+- **Download history** (IndexedDB): skip already-downloaded items, hide them in
+  the view.
+- **Save folder** (File System Access API): large files stream straight to disk.
+- **Account safety**: serial native downloads with configurable delay + jitter;
+  queue pause/resume and auto-pause on Telegram flood errors.
+- **Scope filter** (this chat / all chats) and "hide downloaded".
+- **Selector self-test** with warnings in the panel and popup; live smoke e2e
+  (opt-in via `TGMD_LIVE=1`).
+- New options: delay, jitter, template (with live preview), native photos,
+  large-file threshold, skip downloaded, download while scanning.
+
+### Fixed
+
+- Mutation bursts larger than the batch size were silently dropped.
+- Retries had no backoff; cancel→retry could run a task twice.
+- Download progress never reached the UI.
+- Ctrl+A in the panel's search box selected all media (shadow-DOM retargeting).
+- Escape propagated to Telegram and closed the open chat.
+- Option changes only applied after reloading Telegram.
+- Concurrent statistics updates lost increments; failed→retried→completed
+  tasks stayed counted as failed.
+- The same media was registered several times (URL-based ids); lazy-loaded
+  URLs were never picked up; video posters were counted as photos.
+- Album items downloaded the album's first item; photos were saved at preview
+  resolution; the download menu item was detected by UI language.
+- Web K dates were not read (timestamp is on the bubble), breaking date filters.
+- The extension removed Telegram-owned menu DOM nodes.
+- `parseSizeLabel` thousands separators; `sanitizeFileName` cut extensions and
+  allowed Windows reserved names; CSV lacked a BOM and `\t`/`\r` guards.
+- Filter reset was not persisted; the panel could stay off-screen after resize.
 
 ## [1.0.0] - 2026-06-19
 

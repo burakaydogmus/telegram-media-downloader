@@ -1,14 +1,11 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import {
-  BlobDownloadExecutor,
-  CompositeDownloadExecutor,
   NonRetryableDownloadError,
   HttpDownloadError,
   fetchMedia,
   readBody,
 } from '../../src/features/download/download-executor.js';
 import type {
-  DownloadExecutor,
   NativeDownloader,
   NativeDownloadRequest,
   ProgressReporter,
@@ -117,73 +114,6 @@ describe('fetch helpers', () => {
       withLength,
     );
     expect(withLength).toHaveBeenCalledWith(0.95, 8, 8);
-  });
-});
-
-describe('BlobDownloadExecutor (compat)', () => {
-  it('fetches and saves via an anchor click', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(bodyResponse(5)));
-    const onProgress = vi.fn();
-    await new BlobDownloadExecutor(document).execute(
-      task('blob:abc'),
-      onProgress,
-      new AbortController().signal,
-    );
-    expect(clicks).toEqual(['p.jpg']);
-    expect(onProgress).toHaveBeenCalledWith(1);
-  });
-
-  it('rejects missing URLs and aborted signals', async () => {
-    const executor = new BlobDownloadExecutor(document);
-    await expect(
-      executor.execute(task(), vi.fn(), new AbortController().signal),
-    ).rejects.toBeInstanceOf(NonRetryableDownloadError);
-    const controller = new AbortController();
-    controller.abort();
-    await expect(
-      executor.execute(task('blob:x'), vi.fn(), controller.signal),
-    ).rejects.toThrow('Aborted');
-  });
-});
-
-describe('CompositeDownloadExecutor (compat)', () => {
-  class SpyNative implements NativeDownloader {
-    calls = 0;
-    async download(): Promise<void> {
-      this.calls += 1;
-    }
-  }
-  const failing = (error: Error): DownloadExecutor => ({
-    execute: () => Promise.reject(error),
-  });
-
-  it('falls back to native only on non-retryable errors', async () => {
-    const native = new SpyNative();
-    await new CompositeDownloadExecutor(
-      failing(new NonRetryableDownloadError('stream')),
-      native,
-    ).execute(task('blob:a'), vi.fn(), new AbortController().signal);
-    expect(native.calls).toBe(1);
-
-    await expect(
-      new CompositeDownloadExecutor(failing(new Error('temp')), native).execute(
-        task('blob:a'),
-        vi.fn(),
-        new AbortController().signal,
-      ),
-    ).rejects.toThrow('temp');
-  });
-
-  it('routes videos straight to native', async () => {
-    const native = new SpyNative();
-    const primary = { execute: vi.fn() };
-    await new CompositeDownloadExecutor(primary, native).execute(
-      task('blob:v', { type: 'video' }),
-      vi.fn(),
-      new AbortController().signal,
-    );
-    expect(primary.execute).not.toHaveBeenCalled();
-    expect(native.calls).toBe(1);
   });
 });
 
