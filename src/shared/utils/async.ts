@@ -2,6 +2,54 @@ export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function abortError(): DOMException {
+  return new DOMException('Aborted', 'AbortError');
+}
+
+export function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { name?: unknown }).name === 'AbortError'
+  );
+}
+
+/** Like `delay`, but rejects with an AbortError as soon as `signal` aborts. */
+export function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) return Promise.reject(abortError());
+  return new Promise((resolve, reject) => {
+    const onAbort = (): void => {
+      clearTimeout(handle);
+      reject(abortError());
+    };
+    const handle = setTimeout(
+      () => {
+        signal?.removeEventListener('abort', onAbort);
+        resolve();
+      },
+      Math.max(0, ms),
+    );
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+/**
+ * Resolves after the next paint. rAF never fires in background tabs, so a
+ * timer caps the wait.
+ */
+export function nextFrame(win?: Window | null, maxWaitMs = 50): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, maxWaitMs);
+    const raf = win?.requestAnimationFrame;
+    if (typeof raf === 'function') {
+      raf.call(win, () => {
+        clearTimeout(timer);
+        resolve();
+      });
+    }
+  });
+}
+
 export function debounce<A extends readonly unknown[]>(
   fn: (...args: A) => void,
   waitMs: number,

@@ -1,23 +1,28 @@
 import type { DownloadTask, MediaItem } from '../../shared/types/index.js';
+import { abortError } from '../../shared/utils/index.js';
+import {
+  HttpDownloadError,
+  NonRetryableDownloadError,
+  isNonRetryable,
+} from './download-errors.js';
 
-export type ProgressReporter = (progress: number) => void;
+export {
+  NonRetryableDownloadError,
+  HttpDownloadError,
+  isNonRetryable,
+  isFloodError,
+  floodWaitSeconds,
+} from './download-errors.js';
 
-export class NonRetryableDownloadError extends Error {
-  readonly nonRetryable = true;
-  constructor(message: string) {
-    super(message);
-    this.name = 'NonRetryableDownloadError';
-  }
-}
-
-export function isNonRetryable(error: unknown): boolean {
-  return (
-    error instanceof NonRetryableDownloadError ||
-    (typeof error === 'object' &&
-      error !== null &&
-      (error as { nonRetryable?: unknown }).nonRetryable === true)
-  );
-}
+/**
+ * `progress` is a 0..1 fraction (NaN when unknown — the queue then derives it
+ * from bytes); byte counts are optional.
+ */
+export type ProgressReporter = (
+  progress: number,
+  bytesReceived?: number,
+  totalBytes?: number,
+) => void;
 
 export interface DownloadExecutor {
   execute(
@@ -27,33 +32,103 @@ export interface DownloadExecutor {
   ): Promise<void>;
 }
 
-export class MessageDownloadExecutor implements DownloadExecutor {
-  async execute(
-    task: DownloadTask,
-    onProgress: ProgressReporter,
+/** Tracking context for a native download (task id + templated path). */
+export interface NativeDownloadRequest {
+  readonly taskId: string;
+  readonly relativePath: string;
+  readonly onProgress?: ProgressReporter;
+}
+
+export interface NativeDownloader {
+  download(
+    item: MediaItem,
     signal: AbortSignal,
-  ): Promise<void> {
-    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    request?: NativeDownloadRequest,
+  ): Promise<void>;
+}
 
-    const url = task.item.url;
-    if (url === undefined || url.length === 0) {
-      throw new NonRetryableDownloadError('Media item has no downloadable URL');
+/**
+ * Fetches `url`. A network-level failure (e.g. a MediaSource-backed blob: URL)
+ * is non-retryable; HTTP errors carry their status.
+ */
+export async function fetchMedia(
+  url: string,
+  signal: AbortSignal,
+  fetchFn: typeof fetch = fetch,
+): Promise<Response> {
+  let response: Response;
+  try {
+    response = await fetchFn(url, { signal, credentials: 'include' });
+  } catch (cause) {
+    if (signal.aborted) throw abortError();
+    throw new NonRetryableDownloadError(
+      `Media is not directly downloadable (likely a stream): ${String(cause)}`,
+    );
+  }
+  if (!response.ok) throw new HttpDownloadError(response.status);
+  return response;
+}
+
+export function contentLength(response: Response): number | undefined {
+  const value = Number(response.headers.get('Content-Length'));
+  return Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+/** Reads a response into memory, reporting bytes as they arrive. */
+export async function readBody(
+  response: Response,
+  signal: AbortSignal,
+  onProgress: ProgressReporter,
+  expectedBytes?: number,
+): Promise<Blob> {
+  const type = response.headers.get('Content-Type') ?? 'application/octet-stream';
+  if (!response.body) {
+    const blob = await response.blob();
+    onProgress(0.95, blob.size, blob.size);
+    return blob;
+  }
+  const total = contentLength(response) ?? expectedBytes;
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (signal.aborted) {
+      await reader.cancel().catch(() => undefined);
+      throw abortError();
     }
-
-    onProgress(0.1);
-    const response = await chrome.runtime.sendMessage({
-      type: 'DOWNLOAD_FILE',
-      url,
-      fileName: task.item.fileName ?? `${task.item.type}_${task.item.id}`,
-    });
-    onProgress(1);
-
-    if (!response || response.ok !== true) {
-      throw new Error(response?.error ?? 'Background download failed');
+    if (done) break;
+    if (value) {
+      chunks.push(value);
+      received += value.length;
+      onProgress(total ? Math.min(0.95, received / total) : Number.NaN, received, total);
     }
+  }
+  return new Blob(chunks as BlobPart[], { type });
+}
+
+/** Triggers a browser download of `blob` via a temporary `<a download>`. */
+export function saveBlob(doc: Document, blob: Blob, fileName: string): void {
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const anchor = doc.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = fileName;
+    anchor.rel = 'noopener';
+    anchor.style.display = 'none';
+    doc.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  } finally {
+    // Give the browser time to start the download before releasing the URL.
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
   }
 }
 
+/**
+ * @deprecated Use `createDownloadExecutor`. Kept so the current composition
+ * root keeps compiling; buffers in memory and saves with the raw file name.
+ */
 export class BlobDownloadExecutor implements DownloadExecutor {
   constructor(private readonly doc: Document = document) {}
 
@@ -62,89 +137,20 @@ export class BlobDownloadExecutor implements DownloadExecutor {
     onProgress: ProgressReporter,
     signal: AbortSignal,
   ): Promise<void> {
-    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-
+    if (signal.aborted) throw abortError();
     const url = task.item.url;
     if (url === undefined || url.length === 0) {
       throw new NonRetryableDownloadError('Media item has no downloadable URL');
     }
-
     onProgress(0.02);
-    const blob = await this.fetchBlob(url, signal, onProgress);
-    this.saveBlob(blob, this.fileNameFor(task));
+    const response = await fetchMedia(url, signal);
+    const blob = await readBody(response, signal, onProgress);
+    saveBlob(this.doc, blob, task.item.fileName ?? `${task.item.type}_${task.item.id}`);
     onProgress(1);
   }
-
-  private async fetchBlob(
-    url: string,
-    signal: AbortSignal,
-    onProgress: ProgressReporter,
-  ): Promise<Blob> {
-    let response: Response;
-    try {
-      response = await fetch(url, { signal, credentials: 'include' });
-    } catch (cause) {
-      if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-      // A blob: URL backed by a MediaSource (streamed video) is not fetchable.
-      throw new NonRetryableDownloadError(
-        `Media is not directly downloadable (likely a stream): ${String(cause)}`,
-      );
-    }
-    if (!response.ok) {
-      throw new Error(`Fetch failed with HTTP ${response.status}`);
-    }
-
-    const total = Number(response.headers.get('Content-Length')) || 0;
-    const type = response.headers.get('Content-Type') ?? 'application/octet-stream';
-
-    if (!response.body || total <= 0) {
-      onProgress(0.8);
-      return response.blob();
-    }
-
-    const reader = response.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let received = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (signal.aborted) {
-        await reader.cancel();
-        throw new DOMException('Aborted', 'AbortError');
-      }
-      if (value) {
-        chunks.push(value);
-        received += value.length;
-        onProgress(Math.min(0.95, received / total));
-      }
-    }
-    return new Blob(chunks as BlobPart[], { type });
-  }
-
-  private saveBlob(blob: Blob, fileName: string): void {
-    const objectUrl = URL.createObjectURL(blob);
-    try {
-      const anchor = this.doc.createElement('a');
-      anchor.href = objectUrl;
-      anchor.download = fileName;
-      anchor.rel = 'noopener';
-      anchor.style.display = 'none';
-      this.doc.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-    } finally {
-      // Give the browser time to start the download before releasing the URL.
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
-    }
-  }
-
-  private fileNameFor(task: DownloadTask): string {
-    return task.item.fileName ?? `${task.item.type}_${task.item.id}`;
-  }
 }
-export interface NativeDownloader {
-  download(item: MediaItem, signal: AbortSignal): Promise<void>;
-}
+
+/** @deprecated Use `createDownloadExecutor`. */
 export class CompositeDownloadExecutor implements DownloadExecutor {
   constructor(
     private readonly primary: DownloadExecutor,
@@ -156,20 +162,17 @@ export class CompositeDownloadExecutor implements DownloadExecutor {
     onProgress: ProgressReporter,
     signal: AbortSignal,
   ): Promise<void> {
-    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
-
+    if (signal.aborted) throw abortError();
     const { item } = task;
     const streamed = item.type === 'video' || item.type === 'gif';
     const hasUrl = typeof item.url === 'string' && item.url.length > 0;
 
-    // Photos/docs/audio with a real URL: fetch the bytes directly.
     if (hasUrl && !streamed) {
       try {
         await this.primary.execute(task, onProgress, signal);
         return;
       } catch (error) {
         if (signal.aborted || !isNonRetryable(error)) throw error;
-        // Un-fetchable (e.g. stream): fall through to Telegram's own download.
       }
     }
 
