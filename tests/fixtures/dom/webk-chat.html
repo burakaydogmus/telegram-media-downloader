@@ -1,0 +1,266 @@
+<!-- Web K (tweb) chat snapshot, trimmed. Loaded as <body> content by tests. -->
+<div id="main-columns" class="tabs-container">
+  <div id="column-left" class="tabs-tab main-column">
+    <div class="chatlist-container">
+      <ul class="chatlist">
+        <a class="row chatlist-chat active" data-peer-id="-1001234567890">
+          <div class="avatar-element dialog-avatar" data-peer-id="-1001234567890">
+            <img class="avatar-photo" src="https://cdn.example.org/avatar-chat.jpg" />
+          </div>
+          <div class="row-title"><span class="peer-title">Design Team</span></div>
+        </a>
+      </ul>
+    </div>
+  </div>
+
+  <div id="column-center" class="main-column">
+    <div class="chats-container tabs-container">
+      <div class="chat tabs-tab active" data-type="chat">
+        <div class="sidebar-header topbar">
+          <div class="chat-info-container">
+            <div class="chat-info">
+              <div class="avatar-element avatar-42" data-peer-id="-1001234567890"></div>
+              <div class="person">
+                <div class="content">
+                  <div class="top">
+                    <div class="user-title"><span class="peer-title" data-peer-id="-1001234567890">Design Team</span></div>
+                  </div>
+                  <div class="bottom"><div class="info">42 members</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bubbles has-groups scrolled-down">
+          <div class="scrollable scrollable-y">
+            <div class="bubbles-inner has-rights">
+              <section class="bubbles-date-group">
+                <div class="bubble service is-date is-sticky">
+                  <div class="bubble-content"><div class="service-msg">June 5</div></div>
+                </div>
+                <div class="bubbles-group">
+                  <!-- Single photo: blurred data: thumbnail, full blob not loaded yet. -->
+                  <div class="bubble photo is-in can-have-tail is-group-first" data-mid="101" data-peer-id="-1001234567890" data-timestamp="1749117600">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="name" data-peer-id="777"><span class="peer-title">Alice</span></div>
+                        <div class="attachment media-container">
+                          <img class="thumbnail media-photo" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ" />
+                        </div>
+                        <div class="message spoilers-container">
+                          <span class="time tgico" title="5 June 2025, 10:00:00"><span class="i18n">10:00</span><div class="inner tgico"></div></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="bubble-beside-button with-hover"></div>
+                    <div class="avatar-element user-avatar" data-peer-id="777"><img class="avatar-photo" src="https://cdn.example.org/avatar-alice.jpg" /></div>
+                  </div>
+
+                  <!-- Video: poster thumb img.media-photo + video + duration. -->
+                  <div class="bubble video is-in can-have-tail" data-mid="102" data-peer-id="-1001234567890" data-timestamp="1749117660">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container">
+                          <img class="thumbnail media-photo" src="data:image/jpeg;base64,/9j/VIDEO" />
+                          <video class="media-video" muted playsinline autoplay src="blob:https://web.telegram.org/video-102"></video>
+                          <span class="video-time">0:42</span>
+                          <div class="btn-circle video-play position-center"></div>
+                        </div>
+                        <div class="message"><span class="time tgico"><span class="i18n">10:01</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Round video message. -->
+                  <div class="bubble round is-in" data-mid="103" data-timestamp="1749117720">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container media-round">
+                          <img class="thumbnail media-photo" src="data:image/jpeg;base64,/9j/ROUND" />
+                          <video class="media-video" muted loop playsinline autoplay src="blob:https://web.telegram.org/round-103"></video>
+                          <div class="video-time">0:05</div>
+                        </div>
+                        <div class="message"><span class="time tgico"><span class="i18n">10:02</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- GIF (animation). -->
+                  <div class="bubble is-in" data-mid="104" data-timestamp="1749117780">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container">
+                          <video class="media-video media-gif" muted loop playsinline autoplay src="blob:https://web.telegram.org/gif-104"></video>
+                        </div>
+                        <div class="message"><span class="time tgico"><span class="i18n">10:03</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Document with name + size (rendered inside .message in tweb). -->
+                  <div class="bubble is-in" data-mid="105" data-timestamp="1749117840">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="message spoilers-container">
+                          <div class="document-container" data-mid="105" data-peer-id="-1001234567890">
+                            <div class="document-wrapper">
+                              <div class="document ext-pdf">
+                                <div class="document-ico"><span class="document-ico-ext">pdf</span></div>
+                                <div class="document-name"><middle-ellipsis-element>Quarterly Report.pdf</middle-ellipsis-element></div>
+                                <div class="document-size">2.4 MB</div>
+                              </div>
+                            </div>
+                          </div>
+                          <span class="time tgico"><span class="i18n">10:04</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Voice message. -->
+                  <div class="bubble voice is-in" data-mid="106" data-timestamp="1749117900">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="message">
+                          <audio-element class="audio is-voice" data-mid="106">
+                            <div class="audio-toggle audio-ico"></div>
+                            <div class="audio-waveform"><svg></svg></div>
+                            <div class="audio-time">0:07</div>
+                          </audio-element>
+                          <span class="time tgico"><span class="i18n">10:05</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Music file. -->
+                  <div class="bubble is-in" data-mid="107" data-timestamp="1749117960">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="message">
+                          <div class="document-container" data-mid="107">
+                            <audio-element class="audio">
+                              <div class="audio-details">
+                                <div class="audio-title">Morning Song.mp3</div>
+                                <div class="audio-subtitle">3.4 MB · The Band</div>
+                              </div>
+                            </audio-element>
+                          </div>
+                          <span class="time tgico"><span class="i18n">10:06</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Album of 3 (photo, video, photo); each item carries its own mid. -->
+                  <div class="bubble photo is-album is-in" data-mid="110" data-timestamp="1749118020">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container album">
+                          <div class="album-item grouped-item" data-mid="108">
+                            <div class="album-item-media"><img class="media-photo" src="blob:https://web.telegram.org/album-108" /></div>
+                          </div>
+                          <div class="album-item grouped-item" data-mid="109">
+                            <div class="album-item-media">
+                              <img class="thumbnail media-photo" src="data:image/jpeg;base64,/9j/ALBUMVID" />
+                              <video class="media-video" muted src="blob:https://web.telegram.org/album-109"></video>
+                              <span class="video-time">0:12</span>
+                            </div>
+                          </div>
+                          <div class="album-item grouped-item" data-mid="110">
+                            <div class="album-item-media"><img class="media-photo" src="blob:https://web.telegram.org/album-110" /></div>
+                          </div>
+                        </div>
+                        <div class="message"><span class="time tgico"><span class="i18n">10:07</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sticker. -->
+                  <div class="bubble sticker is-in" data-mid="111" data-timestamp="1749118080">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container media-sticker-wrapper">
+                          <img class="media-sticker" src="blob:https://web.telegram.org/sticker-111" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Text with link preview and a custom emoji. -->
+                  <div class="bubble is-in" data-mid="112" data-timestamp="1749118140">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="message spoilers-container">
+                          Have a look <a href="https://example.org/article">example.org</a>
+                          <custom-emoji-element class="custom-emoji"><img class="media-sticker" src="blob:https://web.telegram.org/emoji" /></custom-emoji-element>
+                          <div class="webpage">
+                            <div class="webpage-quote">
+                              <div class="webpage-preview"><img class="media-photo" src="https://example.org/og.jpg" /></div>
+                              <div class="webpage-name">Example</div>
+                            </div>
+                          </div>
+                          <span class="time tgico"><span class="i18n">10:09</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Text reply quoting a photo: the reply thumbnail is not media of this message. -->
+                  <div class="bubble is-in" data-mid="113" data-timestamp="1749118200">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="reply quote-like">
+                          <div class="reply-media"><img class="media-photo" src="blob:https://web.telegram.org/reply-thumb" /></div>
+                          <div class="reply-content"><div class="reply-title">Alice</div><div class="reply-subtitle">Photo</div></div>
+                        </div>
+                        <div class="message">Nice!<span class="time tgico"><span class="i18n">10:10</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="bubbles-date-group">
+                <div class="bubble service is-date is-sticky">
+                  <div class="bubble-content"><div class="service-msg">June 6, 2025</div></div>
+                </div>
+                <div class="bubble service" data-mid="120">
+                  <div class="bubble-content"><div class="service-msg">Alice changed the group photo<img class="media-photo" src="blob:https://web.telegram.org/group-photo" /></div></div>
+                </div>
+                <div class="bubbles-group">
+                  <!-- No data-timestamp: date comes from the group header + time text. -->
+                  <div class="bubble photo is-out" data-mid="121">
+                    <div class="bubble-content-wrapper">
+                      <div class="bubble-content">
+                        <div class="attachment media-container">
+                          <img class="media-photo" src="blob:https://web.telegram.org/photo-121" />
+                        </div>
+                        <div class="message"><span class="time tgico"><span class="i18n">09:15</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="column-right" class="main-column">
+    <div class="search-super">
+      <div class="search-super-item grid-item" data-mid="101"><img class="media-photo grid-item-media" src="blob:https://web.telegram.org/shared-101" /></div>
+    </div>
+  </div>
+</div>
+
+<div class="media-viewer-whole active">
+  <div class="media-viewer-movers"><div class="media-viewer-aspecter"><img class="thumbnail" src="blob:https://web.telegram.org/viewer" /></div></div>
+</div>
+
+<div id="tg-media-downloader-root">
+  <div class="bubbles"><div class="bubble" data-mid="999"><img class="media-photo" src="https://cdn.example.org/panel.jpg" /></div></div>
+</div>
