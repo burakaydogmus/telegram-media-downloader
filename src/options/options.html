@@ -66,6 +66,119 @@
           <input type="number" id="maxRetries" name="maxRetries" min="0" max="10" />
         </label>
 
+        <label class="field">
+          <span class="field__label">
+            <span data-i18n="options_download_delay"></span>
+            <small
+              class="field__hint"
+              id="downloadDelayMs-hint"
+              data-i18n="options_download_delay_desc"
+            ></small>
+          </span>
+          <input
+            type="number"
+            id="downloadDelayMs"
+            name="downloadDelayMs"
+            min="0"
+            max="60000"
+            step="1"
+            aria-describedby="downloadDelayMs-hint"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field__label">
+            <span data-i18n="options_download_jitter"></span>
+            <small
+              class="field__hint"
+              id="downloadJitterMs-hint"
+              data-i18n="options_download_jitter_desc"
+            ></small>
+          </span>
+          <input
+            type="number"
+            id="downloadJitterMs"
+            name="downloadJitterMs"
+            min="0"
+            max="60000"
+            step="1"
+            aria-describedby="downloadJitterMs-hint"
+          />
+        </label>
+
+        <div class="field">
+          <label class="field__label" for="fileNameTemplate">
+            <span data-i18n="options_file_name_template"></span>
+            <small
+              class="field__hint"
+              data-i18n="options_file_name_template_desc"
+            ></small>
+          </label>
+          <input
+            type="text"
+            id="fileNameTemplate"
+            name="fileNameTemplate"
+            spellcheck="false"
+            autocomplete="off"
+            aria-describedby="templateInvalid templatePreviewBlock templateTokens"
+          />
+          <p id="templateInvalid" class="field__error" role="alert" hidden></p>
+          <p id="templatePreviewBlock" class="field__preview">
+            <span data-i18n="options_template_preview"></span>:
+            <output id="templatePreview" for="fileNameTemplate"></output>
+          </p>
+          <details id="templateTokens" class="field__tokens">
+            <summary data-i18n="options_template_tokens"></summary>
+            <ul>
+              <li><code>{chat}</code> <span data-i18n="options_token_chat"></span></li>
+              <li><code>{peer}</code> <span data-i18n="options_token_peer"></span></li>
+              <li><code>{date}</code> <span data-i18n="options_token_date"></span></li>
+              <li><code>{time}</code> <span data-i18n="options_token_time"></span></li>
+              <li><code>{msgId}</code> <span data-i18n="options_token_msgId"></span></li>
+              <li><code>{index}</code> <span data-i18n="options_token_index"></span></li>
+              <li><code>{type}</code> <span data-i18n="options_token_type"></span></li>
+              <li><code>{name}</code> <span data-i18n="options_token_name"></span></li>
+              <li><code>{ext}</code> <span data-i18n="options_token_ext"></span></li>
+            </ul>
+          </details>
+        </div>
+
+        <label class="field field--switch">
+          <span class="field__label">
+            <span data-i18n="options_prefer_native"></span>
+            <small class="field__hint" data-i18n="options_prefer_native_desc"></small>
+          </span>
+          <input type="checkbox" id="preferNativeDownload" name="preferNativeDownload" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">
+            <span data-i18n="options_large_file_threshold"></span>
+            <small
+              class="field__hint"
+              id="largeFileThresholdMb-hint"
+              data-i18n="options_large_file_threshold_desc"
+            ></small>
+          </span>
+          <input
+            type="number"
+            id="largeFileThresholdMb"
+            name="largeFileThresholdMb"
+            min="1"
+            max="4096"
+            step="1"
+            aria-describedby="largeFileThresholdMb-hint"
+          />
+        </label>
+
+        <label class="field field--switch">
+          <span class="field__label">
+            <span data-i18n="options_skip_downloaded"></span>
+            <small class="field__hint" data-i18n="options_skip_downloaded_desc"></small>
+          </span>
+          <input type="checkbox" id="skipDownloaded" name="skipDownloaded" />
+        </label>
+
         <div class="options__actions">
           <button type="submit" class="btn btn--primary" data-i18n="options_save">
             Save

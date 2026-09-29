@@ -10,6 +10,12 @@ import type {
   MessageResponse,
   ContentState,
 } from '../shared/types/index.js';
+import {
+  classifyStatus,
+  renderPopup,
+  type PopupElements,
+  type SendOutcome,
+} from './popup-view.js';
 
 const logger = new Logger('warn', 'popup');
 const storage = new StorageService(createDefaultStorageDriver(), logger);
@@ -27,11 +33,13 @@ function applyTranslations(i18n: I18n): void {
     const key = el.dataset.i18n as TranslationKey | undefined;
     if (key) el.textContent = i18n.t(key);
   }
+  document.documentElement.lang = i18n.language;
 }
 
 function wireActions(i18n: I18n): void {
   byId('toggle').addEventListener('click', () => void send({ type: 'TOGGLE_PANEL' }));
   byId('rescan').addEventListener('click', () => void rescan(i18n));
+  byId('reload').addEventListener('click', () => void reloadTab());
   byId('open-telegram').addEventListener('click', () => {
     void chrome.tabs.create({ url: 'https://web.telegram.org/k/' });
   });
@@ -46,51 +54,65 @@ async function rescan(i18n: I18n): Promise<void> {
   setTimeout(() => void refreshStatus(i18n), 400);
 }
 
-async function refreshStatus(i18n: I18n): Promise<void> {
-  const status = byId('status');
-  const stats = byId('stats');
-  const response = await send<ContentState>({ type: 'GET_STATE' });
+async function reloadTab(): Promise<void> {
+  const tab = await activeTab();
+  if (tab?.id === undefined) return;
+  await chrome.tabs.reload(tab.id);
+  window.close();
+}
 
-  if (response?.ok && response.data?.detected) {
-    const state = response.data;
-    status.textContent = i18n.t('popup_status_active');
-    status.classList.add('is-active');
-    stats.hidden = false;
-    byId('stat-total').textContent = String(state.totalMedia);
-    byId('stat-selected').textContent = String(state.selected);
-    setEnabled(['toggle', 'rescan'], true);
-  } else {
-    status.textContent = i18n.t('popup_status_inactive');
-    status.classList.remove('is-active');
-    stats.hidden = true;
-    setEnabled(['toggle', 'rescan'], false);
+async function refreshStatus(i18n: I18n): Promise<void> {
+  const tab = await activeTab();
+  const outcome = await send<ContentState>({ type: 'GET_STATE' }, tab);
+  renderPopup(elements(), classifyStatus(tab?.url, outcome), i18n.t);
+}
+
+async function activeTab(): Promise<chrome.tabs.Tab | undefined> {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    return tab;
+  } catch (error) {
+    logger.warn('Could not query the active tab', error);
+    return undefined;
   }
 }
 
 async function send<T = unknown>(
   message: RuntimeMessage,
-): Promise<MessageResponse<T> | undefined> {
+  knownTab?: chrome.tabs.Tab,
+): Promise<SendOutcome<T>> {
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) return undefined;
-    return (await chrome.tabs.sendMessage(tab.id, message)) as MessageResponse<T>;
+    const tab = knownTab ?? (await activeTab());
+    if (tab?.id === undefined) return { ok: false, error: new Error('No active tab') };
+    const response = (await chrome.tabs.sendMessage(tab.id, message)) as
+      | MessageResponse<T>
+      | undefined;
+    return { ok: true, response };
   } catch (error) {
     logger.warn('Message to content script failed', error);
-    return undefined;
+    return { ok: false, error };
   }
+}
+
+function elements(): PopupElements {
+  return {
+    status: byId('status'),
+    stats: byId('stats'),
+    statTotal: byId('stat-total'),
+    statSelected: byId('stat-selected'),
+    notice: byId('notice'),
+    noticeText: byId('notice-text'),
+    reload: byId('reload') as HTMLButtonElement,
+    health: byId('health'),
+    toggle: byId('toggle') as HTMLButtonElement,
+    rescan: byId('rescan') as HTMLButtonElement,
+  };
 }
 
 function byId(id: string): HTMLElement {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing element #${id}`);
   return el;
-}
-
-function setEnabled(ids: readonly string[], enabled: boolean): void {
-  for (const id of ids) {
-    const el = byId(id) as HTMLButtonElement;
-    el.disabled = !enabled;
-  }
 }
 
 void init();

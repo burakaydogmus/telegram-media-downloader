@@ -7,6 +7,7 @@
   --accent: #3390ec;
   --accent-fg: #ffffff;
   --success: #2ea043;
+  --danger: #cf222e;
   color-scheme: light dark;
 }
 
@@ -20,6 +21,7 @@
     --accent: #5ea8ee;
     --accent-fg: #0f1419;
     --success: #4cc26a;
+    --danger: #ff7b72;
   }
 }
 
@@ -75,7 +77,8 @@ body {
 }
 
 select,
-input[type='number'] {
+input[type='number'],
+input[type='text'] {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -126,4 +129,40 @@ input[type='checkbox'] {
   color: var(--success);
   font-weight: 600;
   margin: 0;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field__error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.field__preview {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+.field__preview output {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--fg);
+  word-break: break-all;
+}
+
+.field__tokens {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+.field__tokens summary {
+  cursor: pointer;
+}
+.field__tokens ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.field__tokens code {
+  color: var(--fg);
 }

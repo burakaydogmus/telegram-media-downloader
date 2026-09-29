@@ -6,6 +6,9 @@
   --border: #e2e2e6;
   --accent: #3390ec;
   --accent-fg: #ffffff;
+  --warn-bg: #fff4e5;
+  --warn-fg: #7a4100;
+  --warn-border: #f0b35b;
   color-scheme: light dark;
 }
 
@@ -18,6 +21,9 @@
     --border: #2b3947;
     --accent: #5ea8ee;
     --accent-fg: #0f1419;
+    --warn-bg: #3a2a12;
+    --warn-fg: #ffd9a3;
+    --warn-border: #8a5a1c;
   }
 }
 
@@ -123,4 +129,45 @@ body {
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.popup__notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.popup__notice-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.popup__health {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border: 1px solid var(--warn-border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.popup__health p {
+  margin: 4px 0;
+}
+.popup__health-title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.popup__health-list {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.popup__health-selector {
+  font-size: 11px;
+  word-break: break-all;
+  opacity: 0.85;
+}
+.popup__health-hint {
+  font-style: italic;
 }

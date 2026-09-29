@@ -13,6 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  * and download-queue operations.
  *
  * Run `npm run build` before `npm run test:e2e` so `dist/` exists.
+ * `live-smoke.spec.ts` hits the real Telegram Web and is skipped unless
+ * `TGMD_LIVE=1` (see its header); `--grep-invert live` excludes it explicitly.
  */
 export default defineConfig({
   testDir: resolve(__dirname, 'tests/e2e'),
